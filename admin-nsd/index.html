@@ -325,13 +325,14 @@ select.fi option{background:var(--surface2)}
 
     <!-- UTMs -->
     <div id="panel-utm" style="display:none;height:100%;overflow:hidden;flex-direction:column">
-      <div class="ph"><div><div class="ph-title">Links & UTMs</div><div class="ph-sub">Gerador de links rastreáveis com redirect</div></div><button class="btn-s" onclick="addUTM()">+ Adicionar link</button></div>
+      <div class="ph"><div><div class="ph-title">Links & UTMs</div><div class="ph-sub">Gerador de links rastreáveis com redirect</div></div><button class="btn-s" onclick="openUTMModal()">Gerar links com UTM</button></div>
       <div class="panel-inner on" style="display:block">
-        <div class="field"><div class="field-label">Domínio base</div><input class="fi" id="utm-dom" placeholder="foconareformatributaria.com.br" oninput="renderUTMs()"></div>
-        <div class="utm-wrap"><table class="utm-t">
-          <thead><tr><th>Nome</th><th>Slug redirect</th><th>Destino</th><th>Source</th><th>Medium</th><th>Campaign</th><th>Link gerado</th><th></th></tr></thead>
-          <tbody id="utm-tbody"></tbody>
-        </table></div>
+        <div id="utm-lista-wrap">
+          <div id="utm-lista-empty" style="text-align:center;color:var(--text3);font-size:0.75rem;padding:3rem 0">
+            Nenhum grupo de links criado.<br>Clique em "Gerar links com UTM" para começar.
+          </div>
+          <div id="utm-grupos"></div>
+        </div>
       </div>
     </div>
 
@@ -361,6 +362,44 @@ select.fi option{background:var(--surface2)}
       <div style="display:flex;gap:8px;justify-content:flex-end">
         <button class="btn-g" onclick="closeModalUser()">Cancelar</button>
         <button class="btn-s" onclick="criarUsuario()">Criar usuário</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL UTM -->
+<div id="modal-utm" style="display:none">
+  <div class="modal-ov" onclick="if(event.target===this)closeUTMModal()">
+    <div class="modal" style="max-width:860px;width:95vw">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+        <div class="modal-t" style="margin:0">🔗 Gerar links com UTM</div>
+        <button class="btn-g" onclick="closeUTMModal()" style="font-size:0.72rem">Fechar</button>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-end;margin-bottom:1rem;flex-wrap:wrap">
+        <div class="field" style="flex:1;min-width:200px;margin-bottom:0">
+          <div class="field-label">Nome do grupo</div>
+          <input class="fi" id="utm-group-nome" placeholder="ex: Instagram Reforma Abril">
+        </div>
+        <div class="field" style="flex:1;min-width:200px;margin-bottom:0">
+          <div class="field-label">Domínio base</div>
+          <input class="fi" id="utm-group-dom" placeholder="foconareformatributaria.com.br">
+        </div>
+        <button class="btn-s" onclick="salvarGrupoUTM()" style="white-space:nowrap">Salvar grupo</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="utm-t" style="min-width:700px">
+          <thead><tr>
+            <th>Nome</th>
+            <th>Slug redirect</th>
+            <th>Destino (slug)</th>
+            <th>Source</th>
+            <th>Medium</th>
+            <th>Campaign</th>
+            <th>Link gerado</th>
+            <th><button class="btn-s" onclick="addLinhaUTM()" style="font-size:0.68rem;padding:3px 8px">+ Linha</button></th>
+          </tr></thead>
+          <tbody id="utm-modal-tbody"></tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -695,62 +734,133 @@ async function loadCfg(){
 
 function saveConfigs(){ toast('Configurações salvas!','success'); }
 
+// UTM state
+let utmGrupos=[], utmLinhasModal=[];
+
 async function loadUTMs(){
   try{
-    const {data}=await sbNS.from('utm_links').select('*').order('created_at',{ascending:false});
-    utms=data||[];
-    renderUTMs();
-  }catch(e){ console.warn('utms',e); }
+    const {data}=await sbNS.from('utm_grupos').select('*,utm_links(*)').order('created_at',{ascending:false});
+    utmGrupos=data||[];
+    renderGrupos();
+  }catch(e){ console.warn('utm_grupos',e); }
 }
 
-function renderUTMs(){
-  const tbody=document.getElementById('utm-tbody');
-  if(!utms.length){ tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:1.2rem">Nenhum link criado</td></tr>'; return; }
-  const dom=document.getElementById('utm-dom')?.value||PROJ.dominio;
-  tbody.innerHTML=utms.map((l,i)=>{
+function renderGrupos(){
+  const wrap=document.getElementById('utm-grupos');
+  const empty=document.getElementById('utm-lista-empty');
+  if(!utmGrupos.length){ if(empty) empty.style.display='block'; if(wrap) wrap.innerHTML=''; return; }
+  if(empty) empty.style.display='none';
+  if(!wrap) return;
+  wrap.innerHTML=utmGrupos.map((g,gi)=>{
+    const links=g.utm_links||[], dom=g.dominio||PROJ.dominio;
+    return '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1rem">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem">'
+      +'<div><div style="font-size:0.85rem;font-weight:600;color:var(--text)">'+g.nome+'</div>'
+      +'<div style="font-size:0.7rem;color:var(--text3);font-family:var(--mono)">'+dom+'</div></div>'
+      +'<div style="display:flex;gap:6px">'
+      +'<button class="btn-g" style="font-size:0.7rem" onclick="editarGrupo('+gi+')">Editar</button>'
+      +'<button class="btn-g" style="font-size:0.7rem;color:var(--red);border-color:rgba(248,113,113,0.3)" onclick="delGrupo('+gi+')">Remover</button>'
+      +'</div></div>'
+      +(links.length
+        ? '<div style="overflow-x:auto"><table class="utm-t" style="min-width:600px"><thead><tr><th>Nome</th><th>Link curto</th><th>Destino com UTMs</th><th></th></tr></thead><tbody>'
+          +links.map(l=>{
+            const params=[];
+            if(l.utm_source) params.push('utm_source='+encodeURIComponent(l.utm_source));
+            if(l.utm_medium) params.push('utm_medium='+encodeURIComponent(l.utm_medium));
+            if(l.utm_campaign) params.push('utm_campaign='+encodeURIComponent(l.utm_campaign));
+            const full='https://'+dom+(l.destino_slug||'')+(params.length?'?'+params.join('&'):'');
+            const short='https://'+dom+(l.slug_redirect||'');
+            return '<tr>'
+              +'<td style="color:var(--text);font-size:0.78rem">'+(l.nome||'—')+'</td>'
+              +'<td><div class="ulp" style="cursor:pointer" onclick="cpUrl(this.textContent)" title="Clique para copiar">'+short+'</div></td>'
+              +'<td><div class="ulp" style="font-size:0.63rem;color:var(--text3)">'+full+'</div></td>'
+              +'<td><button class="btn-cl" onclick="cpUrl(\''+short+'\');">Copiar</button></td>'
+              +'</tr>';
+          }).join('')+'</tbody></table></div>'
+        : '<div style="font-size:0.73rem;color:var(--text3)">Nenhum link neste grupo</div>')
+      +'</div>';
+  }).join('');
+}
+
+function openUTMModal(grupo){
+  document.getElementById('modal-utm').style.display='block';
+  utmLinhasModal=grupo?[...(grupo.utm_links||[])]:[];
+  document.getElementById('utm-group-nome').value=grupo?.nome||'';
+  document.getElementById('utm-group-dom').value=grupo?.dominio||PROJ.dominio;
+  window._editGrupoId=grupo?.id||null;
+  renderModalUTM();
+}
+function closeUTMModal(){ document.getElementById('modal-utm').style.display='none'; utmLinhasModal=[]; window._editGrupoId=null; }
+function editarGrupo(gi){ openUTMModal(utmGrupos[gi]); }
+
+function addLinhaUTM(){
+  utmLinhasModal.push({id:'new-'+Date.now(),nome:'',slug_redirect:'',destino_slug:'',utm_source:'',utm_medium:'',utm_campaign:''});
+  renderModalUTM();
+}
+
+function renderModalUTM(){
+  const tbody=document.getElementById('utm-modal-tbody');
+  if(!tbody) return;
+  const dom=document.getElementById('utm-group-dom')?.value||PROJ.dominio;
+  if(!utmLinhasModal.length){ tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:1rem">Clique em "+ Linha" para adicionar links</td></tr>'; return; }
+  tbody.innerHTML=utmLinhasModal.map((l,i)=>{
     const params=[];
     if(l.utm_source) params.push('utm_source='+encodeURIComponent(l.utm_source));
     if(l.utm_medium) params.push('utm_medium='+encodeURIComponent(l.utm_medium));
     if(l.utm_campaign) params.push('utm_campaign='+encodeURIComponent(l.utm_campaign));
-    const fullUrl='https://'+dom+(l.destino_slug||'')+(params.length?'?'+params.join('&'):'');
-    const shortUrl=dom+(l.slug_redirect||'/slug');
-    return `<tr>
-      <td><input value="${l.nome||''}" oninput="updUTM(${i},'nome',this.value)" placeholder="Bio Instagram"></td>
-      <td><input value="${l.slug_redirect||''}" oninput="updUTM(${i},'slug_redirect',this.value)" placeholder="/ig-bio" style="width:80px"></td>
-      <td><input value="${l.destino_slug||''}" oninput="updUTM(${i},'destino_slug',this.value)" placeholder="/reforma" style="width:80px"></td>
-      <td><input value="${l.utm_source||''}" oninput="updUTM(${i},'utm_source',this.value)" placeholder="instagram" style="width:85px"></td>
-      <td><input value="${l.utm_medium||''}" oninput="updUTM(${i},'utm_medium',this.value)" placeholder="bio" style="width:65px"></td>
-      <td><input value="${l.utm_campaign||''}" oninput="updUTM(${i},'utm_campaign',this.value)" placeholder="reforma-abr" style="width:95px"></td>
-      <td>
-        <div class="ulp">${shortUrl}</div>
-        <div class="ua">↓ redireciona para</div>
-        <div class="ulp" style="font-size:0.63rem;color:var(--text3)">${fullUrl}</div>
-        <button class="btn-cl" onclick="navigator.clipboard.writeText('https://${shortUrl}').then(()=>toast('Copiado!','success'))">Copiar link curto</button>
-      </td>
-      <td><button class="btn-dr" onclick="delUTM(${i})">✕</button></td>
-    </tr>`;
+    const full='https://'+dom+(l.destino_slug||'')+(params.length?'?'+params.join('&'):'');
+    const short=dom+(l.slug_redirect||'/slug');
+    return '<tr>'
+      +'<td><input value="'+(l.nome||'')+'" oninput="utmLinhasModal['+i+'].nome=this.value;renderModalUTM()" placeholder="Bio Instagram"></td>'
+      +'<td><input value="'+(l.slug_redirect||'')+'" oninput="utmLinhasModal['+i+'].slug_redirect=this.value;renderModalUTM()" placeholder="/ig-bio" style="width:80px"></td>'
+      +'<td><input value="'+(l.destino_slug||'')+'" oninput="utmLinhasModal['+i+'].destino_slug=this.value;renderModalUTM()" placeholder="/reforma" style="width:80px"></td>'
+      +'<td><input value="'+(l.utm_source||'')+'" oninput="utmLinhasModal['+i+'].utm_source=this.value;renderModalUTM()" placeholder="instagram" style="width:80px"></td>'
+      +'<td><input value="'+(l.utm_medium||'')+'" oninput="utmLinhasModal['+i+'].utm_medium=this.value;renderModalUTM()" placeholder="bio" style="width:65px"></td>'
+      +'<td><input value="'+(l.utm_campaign||'')+'" oninput="utmLinhasModal['+i+'].utm_campaign=this.value;renderModalUTM()" placeholder="reforma-abr" style="width:90px"></td>'
+      +'<td>'
+      +'<div class="ulp">'+short+'</div>'
+      +'<div class="ua">↓ redireciona para</div>'
+      +'<div class="ulp" style="font-size:0.63rem;color:var(--text3)">'+full+'</div>'
+      +'<button class="btn-cl" onclick="cpUrl(this.dataset.u)" data-u="https://'+short+'">Copiar</button>'
+      +'</td>'
+      +'<td><button class="btn-dr" onclick="utmLinhasModal.splice('+i+',1);renderModalUTM()">✕</button></td>'
+      +'</tr>';
   }).join('');
 }
 
-async function addUTM(){
+async function salvarGrupoUTM(){
+  const nome=document.getElementById('utm-group-nome').value.trim();
+  const dom=document.getElementById('utm-group-dom').value.trim()||PROJ.dominio;
+  if(!nome){ toast('Dê um nome ao grupo.','error'); return; }
   try{
-    const {data,error}=await sbNS.from('utm_links').insert({nome:'',slug_redirect:'',destino_slug:'',utm_source:'',utm_medium:'',utm_campaign:''}).select().single();
-    if(error) throw error;
-    utms.unshift(data);
-    renderUTMs();
-    showPanel('utm');
+    let gid=window._editGrupoId;
+    if(gid){
+      await sbNS.from('utm_grupos').update({nome,dominio:dom,updated_at:new Date().toISOString()}).eq('id',gid);
+    } else {
+      const {data,error}=await sbNS.from('utm_grupos').insert({nome,dominio:dom}).select().single();
+      if(error) throw error;
+      gid=data.id;
+    }
+    await sbNS.from('utm_links').delete().eq('grupo_id',gid);
+    if(utmLinhasModal.length){
+      const linhas=utmLinhasModal.map(l=>({grupo_id:gid,nome:l.nome,slug_redirect:l.slug_redirect,destino_slug:l.destino_slug,utm_source:l.utm_source,utm_medium:l.utm_medium,utm_campaign:l.utm_campaign}));
+      await sbNS.from('utm_links').insert(linhas);
+    }
+    closeUTMModal();
+    await loadUTMs();
+    toast('Grupo salvo!','success');
   }catch(e){ toast('Erro: '+e.message,'error'); }
 }
 
-async function updUTM(i,campo,valor){
-  utms[i][campo]=valor;
-  try{ await sbNS.from('utm_links').update({[campo]:valor}).eq('id',utms[i].id); }catch(e){ console.warn(e); }
-  renderUTMs();
-}
-
-async function delUTM(i){
-  if(!confirm('Remover este link?')) return;
-  try{ await sbNS.from('utm_links').delete().eq('id',utms[i].id); utms.splice(i,1); renderUTMs(); }catch(e){ toast('Erro: '+e.message,'error'); }
+async function delGrupo(gi){
+  const g=utmGrupos[gi];
+  if(!confirm('Remover o grupo "'+g.nome+'" e todos os seus links?')) return;
+  try{
+    await sbNS.from('utm_links').delete().eq('grupo_id',g.id);
+    await sbNS.from('utm_grupos').delete().eq('id',g.id);
+    await loadUTMs();
+    toast('Grupo removido.','success');
+  }catch(e){ toast('Erro: '+e.message,'error'); }
 }
 
 // ══════════════════════════════════════════
@@ -823,7 +933,7 @@ async function removerUsuario(uid, nome){
   }catch(e){ toast('Erro: '+e.message,'error'); }
 }
 
-function cpUrl(url){ navigator.clipboard.writeText('https://'+url).then(()=>toast('URL copiada!','success')); }
+function cpUrl(url){ const u=url.startsWith('http')?url:'https://'+url; navigator.clipboard.writeText(u).then(()=>toast('Copiado!','success')); }
 
 function toast(msg,tipo='info'){
   const el=document.getElementById('toast');
