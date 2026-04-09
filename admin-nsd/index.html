@@ -1503,11 +1503,25 @@ async function gerarIA(tipo){
   };
 
   try{
+    // Busca chave e modelo do Supabase Auren
+    const [{data:keyRow},{data:modelRow}] = await Promise.all([
+      sbAuren.from('app_config').select('value').eq('key','anthropic_api_key').single(),
+      sbAuren.from('app_config').select('value').eq('key','ai_model_smart').single()
+    ]);
+    const apiKey = keyRow?.value;
+    const model  = modelRow?.value || 'claude-sonnet-4-20250514';
+    if(!apiKey) throw new Error('Chave da API Anthropic não encontrada em app_config.');
+
     const res = await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
+        model: model,
         max_tokens:1000,
         messages:[{role:'user',content:prompts[tipo]}]
       })
