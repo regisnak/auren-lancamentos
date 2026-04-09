@@ -1230,10 +1230,20 @@ function testarWa(){
 // ══════════════════════════════════════════
 async function loadConfig(){
   try{
-    const url = 'https://raw.githubusercontent.com/'+CFG.GITHUB_REPO+'/'+CFG.GITHUB_BRANCH+'/'+CFG.GITHUB_FILE+'?t='+Date.now();
-    const res = await fetch(url);
+    // Busca token primeiro
+    const {data:sec} = await sbAuren.from('admin_secrets').select('github_token').eq('project','nsd').single();
+    const token = sec?.github_token;
+    if(!token){ console.warn('loadConfig: token não encontrado'); return; }
+
+    // Usa API do GitHub (funciona com repos privados)
+    const apiUrl = 'https://api.github.com/repos/'+CFG.GITHUB_REPO+'/contents/'+CFG.GITHUB_FILE+'?ref='+CFG.GITHUB_BRANCH;
+    const res = await fetch(apiUrl, {
+      headers:{ Authorization:'Bearer '+token, Accept:'application/vnd.github+json' }
+    });
     if(!res.ok) return;
-    const txt = await res.text();
+    const json = await res.json();
+    // Conteúdo vem em base64
+    const txt = decodeURIComponent(escape(atob(json.content.split('\n').join(''))));
     const match = txt.match(/const CONFIG\s*=\s*(\{[\s\S]*?\});/);
     if(!match) return;
     let cfg;
