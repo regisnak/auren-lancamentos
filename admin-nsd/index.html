@@ -16,17 +16,36 @@
     --surface3:#1e2840;
     --border:rgba(212,175,100,0.12);
     --border2:rgba(212,175,100,0.28);
-    --text:#f0ece4;
-    --text2:#8a9ab8;
-    --text3:#4a5a78;
-    --accent:#c9a84c;
-    --accent2:#e8c87a;
+    --text:#ffffff;
+    --text2:#b8cce4;
+    --text3:#7a9ab8;
+    --accent:#e8c050;
+    --accent2:#f5d878;
     --green:#22c55e;
     --red:#ef4444;
     --blue:#7eaadc;
     --amber:#e8a020;
     --font:'Sora',sans-serif;
     --mono:'DM Mono',monospace;
+  }
+
+
+  [data-theme='light'] {
+    --bg:#f0f4f8;
+    --surface:#ffffff;
+    --surface2:#e8eef5;
+    --surface3:#dde5ef;
+    --border:rgba(30,80,160,0.15);
+    --border2:rgba(30,80,160,0.3);
+    --text:#0d1b2e;
+    --text2:#2a4a6e;
+    --text3:#6a8aae;
+    --accent:#1a4fa0;
+    --accent2:#1e63cc;
+    --green:#16a34a;
+    --red:#dc2626;
+    --blue:#1e63cc;
+    --amber:#c27a00;
   }
 
   body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh}
@@ -73,6 +92,12 @@
   }
   .dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
   .dot.off{background:var(--text3)}
+  .btn-theme{
+    font-size:0.9rem;padding:4px 8px;border-radius:6px;
+    border:1px solid var(--border);background:transparent;
+    color:var(--accent2);cursor:pointer;transition:all 0.15s;
+  }
+  .btn-theme:hover{background:var(--surface2)}
   .btn-logout{
     font-size:0.72rem;padding:5px 12px;border-radius:6px;
     border:1px solid var(--border);background:transparent;
@@ -386,6 +411,7 @@
         <span id="site-status">verificando...</span>
       </div>
       <span style="font-size:0.68rem;color:var(--text3)" id="last-deploy"></span>
+      <button class="btn-theme" id="btn-theme" onclick="toggleTheme()" title="Alternar tema">☀</button>
       <button class="btn-logout" onclick="doLogout()">Sair</button>
     </div>
   </div>
@@ -960,6 +986,23 @@ const sbNSD   = supabase.createClient(CFG.NSD_URL,   CFG.NSD_SERVICE);
 // ══════════════════════════════════════════
 // AUTH
 // ══════════════════════════════════════════
+function toggleTheme(){
+  const html = document.documentElement;
+  const isLight = html.getAttribute('data-theme') === 'light';
+  html.setAttribute('data-theme', isLight ? '' : 'light');
+  document.getElementById('btn-theme').textContent = isLight ? '☀' : '🌙';
+  localStorage.setItem('nsd-theme', isLight ? 'dark' : 'light');
+}
+
+// Restore saved theme
+(function(){
+  const saved = localStorage.getItem('nsd-theme');
+  if(saved === 'light'){
+    document.documentElement.setAttribute('data-theme','light');
+    setTimeout(()=>{ const b=document.getElementById('btn-theme'); if(b) b.textContent='🌙'; },100);
+  }
+})();
+
 async function doLogin(){
   const email = document.getElementById('login-email').value.trim();
   const pass  = document.getElementById('login-password').value;
