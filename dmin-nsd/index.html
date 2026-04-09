@@ -1,1 +1,1541 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin NSD — Núcleo Superior de Direito</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
+  *{box-sizing:border-box;margin:0;padding:0}
+
+  :root{
+    --bg:#0b0e1a;
+    --surface:#111827;
+    --surface2:#1a2236;
+    --surface3:#1e2840;
+    --border:rgba(212,175,100,0.12);
+    --border2:rgba(212,175,100,0.28);
+    --text:#f0ece4;
+    --text2:#8a9ab8;
+    --text3:#4a5a78;
+    --accent:#c9a84c;
+    --accent2:#e8c87a;
+    --green:#22c55e;
+    --red:#ef4444;
+    --blue:#7eaadc;
+    --amber:#e8a020;
+    --font:'Sora',sans-serif;
+    --mono:'DM Mono',monospace;
+  }
+
+  body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh}
+
+  /* ── LOGIN ── */
+  #login-screen{
+    display:flex;align-items:center;justify-content:center;
+    min-height:100vh;padding:2rem;
+  }
+  .login-card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:16px;padding:2.5rem;width:100%;max-width:400px;
+  }
+  .login-logo{
+    margin-bottom:1.5rem;
+    display:flex;align-items:center;
+  }
+  .login-logo img{height:48px;width:auto;border-radius:8px}
+  .login-title{font-size:1.35rem;font-weight:600;color:var(--accent2);margin-bottom:4px}
+  .login-sub{font-size:0.8rem;color:var(--text3);margin-bottom:2rem}
+
+  /* ── APP ── */
+  #app{display:none}
+
+  /* ── TOPBAR ── */
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 1.5rem;height:56px;
+    background:var(--surface);border-bottom:1px solid var(--border);
+    position:sticky;top:0;z-index:100;
+  }
+  .topbar-left{display:flex;align-items:center;gap:12px}
+  .t-logo{
+    height:32px;width:auto;
+    display:flex;align-items:center;
+  }
+  .t-logo img{height:32px;width:auto;border-radius:6px}
+  .t-name{font-size:0.9rem;font-weight:600;color:var(--accent2)}
+  .t-url{font-size:0.72rem;color:var(--text3)}
+  .t-right{display:flex;align-items:center;gap:10px}
+  .status-dot{
+    display:flex;align-items:center;gap:6px;
+    font-size:0.72rem;color:var(--text2);
+  }
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+  .dot.off{background:var(--text3)}
+  .btn-logout{
+    font-size:0.72rem;padding:5px 12px;border-radius:6px;
+    border:1px solid var(--border);background:transparent;
+    color:var(--text3);cursor:pointer;font-family:var(--font);
+    transition:color 0.15s,border-color 0.15s;
+  }
+  .btn-logout:hover{color:var(--text);border-color:var(--border2)}
+
+  /* ── TABS ── */
+  .tabs{
+    display:flex;gap:2px;padding:0 1.5rem;
+    background:var(--surface);border-bottom:1px solid var(--border);
+  }
+  .tab{
+    font-size:0.78rem;font-weight:500;padding:12px 16px;
+    border-bottom:2px solid transparent;cursor:pointer;
+    color:var(--text3);transition:all 0.15s;white-space:nowrap;
+  }
+  .tab:hover{color:var(--text2)}
+  .tab.active{color:var(--accent2);border-bottom-color:var(--accent)}
+
+  /* ── CONTENT ── */
+  .content{padding:1.5rem;max-width:1200px;margin:0 auto}
+
+  /* ── PANELS ── */
+  .panel-grid{display:grid;grid-template-columns:1fr 320px;gap:1.25rem;align-items:start}
+  .panel{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:12px;padding:1.25rem;
+  }
+  .panel-title{
+    font-size:0.72rem;font-weight:500;color:var(--accent);
+    text-transform:uppercase;letter-spacing:0.1em;
+    margin-bottom:1rem;display:flex;align-items:center;gap:8px;
+  }
+  .panel-title::before{
+    content:'';width:3px;height:12px;
+    background:var(--accent);border-radius:2px;
+  }
+  .section-label{
+    font-size:0.68rem;font-weight:500;color:var(--text3);
+    text-transform:uppercase;letter-spacing:0.1em;
+    margin:1.25rem 0 0.75rem;padding-bottom:6px;
+    border-bottom:1px solid var(--border);
+  }
+  .section-label:first-child{margin-top:0}
+
+  /* ── FIELDS ── */
+  .field{margin-bottom:12px}
+  .field-label{font-size:0.72rem;color:var(--text2);margin-bottom:5px;font-weight:500}
+  .field-input{
+    width:100%;background:var(--surface2);border:1px solid var(--border);
+    border-radius:8px;color:var(--text);font-family:var(--font);
+    font-size:0.83rem;padding:8px 11px;outline:none;
+    transition:border-color 0.2s;
+  }
+  .field-input:focus{border-color:var(--accent)}
+  .field-input::placeholder{color:var(--text3)}
+  textarea.field-input{min-height:72px;resize:vertical}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+  /* ── AI BOX ── */
+  .ai-box{
+    background:rgba(201,168,76,0.06);border:1px solid var(--border2);
+    border-radius:10px;padding:1rem;margin-bottom:1.25rem;
+  }
+  .ai-label{
+    font-size:0.68rem;font-weight:600;color:var(--accent);
+    text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;
+    display:flex;align-items:center;gap:6px;
+  }
+  .ai-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .btn-ai{
+    font-size:0.72rem;padding:5px 12px;border-radius:6px;
+    border:1px solid var(--border2);background:rgba(201,168,76,0.1);
+    color:var(--accent);cursor:pointer;font-family:var(--font);
+    transition:background 0.15s;
+  }
+  .btn-ai:hover{background:rgba(201,168,76,0.2)}
+  .btn-ai.primary{
+    background:linear-gradient(135deg,#c9a84c,#e8c87a);
+    color:#0b0e1a;border:none;font-weight:600;
+  }
+  .btn-ai.primary:hover{opacity:0.9}
+  .btn-ai:disabled{opacity:0.4;cursor:not-allowed}
+
+  /* ── WA PREVIEW ── */
+  .wa-preview{
+    background:var(--surface2);border:1px solid var(--border);
+    border-radius:8px;padding:8px 11px;margin-top:6px;
+    font-size:0.72rem;color:var(--text3);display:flex;
+    align-items:center;justify-content:space-between;gap:8px;
+  }
+  .wa-link{font-family:var(--mono);font-size:0.68rem;color:var(--blue);word-break:break-all}
+  .btn-test{
+    font-size:0.68rem;padding:3px 8px;border-radius:5px;
+    border:1px solid rgba(126,170,220,0.3);background:transparent;
+    color:var(--blue);cursor:pointer;font-family:var(--font);white-space:nowrap;
+  }
+
+  /* ── PREVIEW PHONE ── */
+  .preview-wrap{position:sticky;top:80px}
+  .preview-phone{
+    width:168px;margin:0 auto;
+    border:1px solid var(--border2);border-radius:14px;
+    overflow:hidden;background:#0b0e1a;
+  }
+  .ph-bar{height:8px;background:#1a2236;display:flex;align-items:center;justify-content:center}
+  .ph-dot{width:32px;height:3px;border-radius:2px;background:#2a3450}
+  .ph-hero{
+    height:52px;background:#111827;
+    display:flex;align-items:center;justify-content:center;
+    border-bottom:1px solid #1a2236;
+  }
+  .ph-hero-text{font-size:7px;color:#c9a84c;font-weight:500;text-align:center;padding:0 8px;line-height:1.5}
+  .ph-body{padding:8px}
+  .ph-tag{font-size:6px;background:#1a2236;color:#8a9ab8;padding:2px 6px;border-radius:3px;display:inline-block;margin-bottom:5px}
+  .ph-h1{font-size:7px;color:#f0ece4;font-weight:500;line-height:1.4;margin-bottom:3px}
+  .ph-sub{font-size:6px;color:#4a5a78;line-height:1.4;margin-bottom:6px}
+  .ph-price{background:#1a2236;border-radius:4px;padding:5px;margin-bottom:5px}
+  .ph-price-val{font-size:9px;color:#c9a84c;font-weight:500}
+  .ph-price-sub{font-size:6px;color:#8a9ab8}
+  .ph-btn{background:#c9a84c;border-radius:4px;padding:5px;text-align:center;font-size:7px;color:#0b0e1a;font-weight:600;margin-bottom:4px;cursor:pointer}
+  .ph-wa{border:1px solid rgba(34,197,94,0.4);border-radius:4px;padding:4px;text-align:center;font-size:6px;color:#22c55e}
+
+  /* ── VERSION CARDS ── */
+  .ver-list{margin-top:1rem}
+  .ver-item{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:8px 10px;border-radius:8px;border:1px solid var(--border);
+    margin-bottom:6px;background:var(--surface2);cursor:pointer;
+    transition:border-color 0.15s;
+  }
+  .ver-item:hover{border-color:var(--border2)}
+  .ver-item.active-ver{border-color:var(--accent)}
+  .ver-name{font-size:0.78rem;font-weight:500;color:var(--text)}
+  .ver-conv{font-size:0.68rem;color:var(--green)}
+  .ver-badge{
+    font-size:0.65rem;padding:2px 8px;border-radius:10px;
+  }
+  .live{background:rgba(34,197,94,0.15);color:var(--green)}
+  .teste{background:rgba(232,160,32,0.15);color:var(--amber)}
+
+  /* ── FOOTER ── */
+  .footer{
+    position:fixed;bottom:0;left:0;right:0;
+    background:var(--surface);border-top:1px solid var(--border);
+    padding:12px 1.5rem;display:flex;
+    align-items:center;justify-content:space-between;z-index:100;
+  }
+  .footer-status{display:flex;align-items:center;gap:8px;font-size:0.75rem;color:var(--text2)}
+  .footer-btns{display:flex;gap:8px}
+  .btn-ghost{
+    font-size:0.82rem;padding:8px 16px;border-radius:8px;
+    border:1px solid var(--border2);background:transparent;
+    color:var(--text2);cursor:pointer;font-family:var(--font);
+    transition:all 0.15s;
+  }
+  .btn-ghost:hover{color:var(--text);border-color:var(--accent)}
+  .btn-save{
+    font-size:0.82rem;padding:8px 20px;border-radius:8px;
+    border:none;background:linear-gradient(135deg,#c9a84c,#e8c87a);
+    color:#0b0e1a;font-weight:600;cursor:pointer;font-family:var(--font);
+    transition:opacity 0.15s;display:flex;align-items:center;gap:6px;
+  }
+  .btn-save:hover{opacity:0.9}
+  .btn-save:disabled{opacity:0.4;cursor:not-allowed}
+
+  /* ── LOADING BAR ── */
+  .loading-bar{
+    height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent));
+    background-size:200% 100%;animation:shimmer 1.2s infinite;
+    border-radius:2px;margin:8px 0;display:none;
+  }
+  .loading-bar.visible{display:block}
+  @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+
+  /* ── TOASTS ── */
+  #toast{
+    position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+    background:var(--surface);border:1px solid var(--border2);
+    border-radius:8px;padding:10px 18px;font-size:0.8rem;
+    color:var(--text);z-index:999;display:none;
+    box-shadow:0 4px 24px rgba(0,0,0,0.4);
+  }
+  #toast.show{display:block}
+  #toast.success{border-color:rgba(34,197,94,0.4);color:var(--green)}
+  #toast.error{border-color:rgba(239,68,68,0.4);color:var(--red)}
+
+  /* ── DASHBOARD ── */
+  .metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.25rem}
+  .metric-card{
+    background:var(--surface2);border-radius:10px;
+    padding:1rem;border:1px solid var(--border);
+  }
+  .metric-label{font-size:0.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
+  .metric-value{font-size:1.6rem;font-weight:600;color:var(--text)}
+  .metric-sub{font-size:0.7rem;color:var(--text3);margin-top:2px}
+  .metric-up{color:var(--green)}
+  .metric-down{color:var(--red)}
+  .table-wrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:0.78rem}
+  th{text-align:left;padding:8px 12px;font-size:0.68rem;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid var(--border)}
+  td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text2)}
+  tr:hover td{background:rgba(255,255,255,0.02)}
+  .badge-green{background:rgba(34,197,94,0.12);color:var(--green);font-size:0.65rem;padding:2px 7px;border-radius:4px}
+  .badge-amber{background:rgba(232,160,32,0.12);color:var(--amber);font-size:0.65rem;padding:2px 7px;border-radius:4px}
+  .badge-blue{background:rgba(126,170,220,0.12);color:var(--blue);font-size:0.65rem;padding:2px 7px;border-radius:4px}
+
+  /* ── FORM TAB ── */
+  .checkbox-group{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .chip{
+    font-size:0.72rem;padding:5px 12px;border-radius:20px;
+    border:1px solid var(--border);background:var(--surface2);
+    color:var(--text2);cursor:pointer;transition:all 0.15s;user-select:none;
+  }
+  .chip.on{background:rgba(201,168,76,0.12);border-color:var(--accent);color:var(--accent2)}
+
+  /* ── IMAGE TAB ── */
+  .upload-zone{
+    border:2px dashed var(--border2);border-radius:12px;
+    padding:2rem;text-align:center;cursor:pointer;
+    transition:border-color 0.2s;
+  }
+  .upload-zone:hover{border-color:var(--accent)}
+  .upload-zone input{display:none}
+  .upload-icon{font-size:2rem;margin-bottom:8px}
+  .upload-label{font-size:0.83rem;color:var(--text2);margin-bottom:4px}
+  .upload-sub{font-size:0.72rem;color:var(--text3)}
+  .img-preview{
+    width:100%;max-height:200px;object-fit:cover;
+    border-radius:8px;margin-top:1rem;display:none;
+  }
+  .img-url-copy{
+    background:var(--surface2);border:1px solid var(--border);
+    border-radius:8px;padding:8px 11px;margin-top:8px;
+    font-family:var(--mono);font-size:0.72rem;color:var(--blue);
+    display:none;word-break:break-all;cursor:pointer;
+  }
+
+  /* PAGE SECTIONS */
+  .tab-content{display:none;padding-bottom:80px}
+  .tab-content.active{display:block}
+
+  /* DEPLOY LOG */
+  .deploy-log{
+    background:var(--surface2);border:1px solid var(--border);
+    border-radius:8px;padding:10px 14px;margin-top:10px;
+    font-family:var(--mono);font-size:0.72rem;color:var(--text3);
+    max-height:120px;overflow-y:auto;display:none;
+  }
+  .deploy-log.visible{display:block}
+  .log-line{margin-bottom:3px}
+  .log-ok{color:var(--green)}
+  .log-err{color:var(--red)}
+  .log-info{color:var(--blue)}
+
+  /* RESPONSIVE */
+  @media(max-width:768px){
+    .panel-grid{grid-template-columns:1fr}
+    .metrics-grid{grid-template-columns:repeat(2,1fr)}
+    .grid3{grid-template-columns:1fr 1fr}
+    .preview-wrap{display:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     LOGIN
+═══════════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo"><img src="logo.png" alt="NSD"></div>
+    <div class="login-title">Admin NSD</div>
+    <div class="login-sub">Acesse com sua conta Auren</div>
+    <div class="field">
+      <div class="field-label">E-mail</div>
+      <input class="field-input" type="email" id="login-email" placeholder="seu@email.com">
+    </div>
+    <div class="field">
+      <div class="field-label">Senha</div>
+      <input class="field-input" type="password" id="login-password" placeholder="••••••••"
+        onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="loading-bar" id="login-bar"></div>
+    <div id="login-error" style="font-size:0.75rem;color:var(--red);margin-bottom:10px;display:none"></div>
+    <button class="btn-save" style="width:100%;justify-content:center" onclick="doLogin()">
+      Entrar
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     APP
+═══════════════════════════════════════════ -->
+<div id="app">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="t-logo"><img src="logo.png" alt="NSD"></div>
+      <div>
+        <div class="t-name">Núcleo Superior de Direito</div>
+        <div class="t-url">foconareformatributaria.com.br</div>
+      </div>
+    </div>
+    <div class="t-right">
+      <div class="status-dot">
+        <div class="dot" id="site-dot"></div>
+        <span id="site-status">verificando...</span>
+      </div>
+      <span style="font-size:0.68rem;color:var(--text3)" id="last-deploy"></span>
+      <button class="btn-logout" onclick="doLogout()">Sair</button>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('editor')">Editor</div>
+    <div class="tab" onclick="switchTab('formulario')">Formulário</div>
+    <div class="tab" onclick="switchTab('imagens')">Imagens</div>
+    <div class="tab" onclick="switchTab('pixels')">Pixels & Scripts</div>
+    <div class="tab" onclick="switchTab('dashboard')">Dashboard</div>
+    <div class="tab" onclick="switchTab('versoes')">Teste A/B</div>
+  </div>
+
+  <!-- ── TAB: EDITOR ── -->
+  <div class="tab-content active" id="tab-editor">
+    <div class="content">
+      <div class="panel-grid">
+        <div>
+          <!-- AI -->
+          <div class="ai-box">
+            <div class="ai-label">✦ Gerar com IA</div>
+            <textarea class="field-input" id="ai-brief" style="min-height:60px"
+              placeholder="Descreva o produto, público e o tom desejado... ex: Imersão ao vivo sobre Reforma Tributária para advogados que querem se destacar. Tom: urgência e autoridade."></textarea>
+            <div class="ai-btns">
+              <button class="btn-ai primary" onclick="gerarIA('tudo')">✦ Gerar tudo</button>
+              <button class="btn-ai" onclick="gerarIA('headline')">Headline</button>
+              <button class="btn-ai" onclick="gerarIA('subheadline')">Subheadline</button>
+              <button class="btn-ai" onclick="gerarIA('cta')">CTAs</button>
+              <button class="btn-ai" onclick="gerarIA('beneficios')">Benefícios</button>
+            </div>
+            <div class="loading-bar" id="ai-bar"></div>
+          </div>
+
+          <!-- EVENTO -->
+          <div class="panel">
+            <div class="panel-title">Evento</div>
+            <div class="grid2">
+              <div class="field">
+                <div class="field-label">Nome do evento</div>
+                <input class="field-input" id="evento-nome" placeholder="Imersão Certificação Reforma Tributária">
+              </div>
+              <div class="field">
+                <div class="field-label">Data (exibição)</div>
+                <input class="field-input" id="evento-data" placeholder="25 de abril de 2025">
+              </div>
+            </div>
+            <div class="grid3">
+              <div class="field">
+                <div class="field-label">Data ISO (countdown)</div>
+                <input class="field-input" id="evento-dataISO" type="datetime-local">
+              </div>
+              <div class="field">
+                <div class="field-label">Horário</div>
+                <input class="field-input" id="evento-horario" placeholder="19h (Brasília)">
+              </div>
+              <div class="field">
+                <div class="field-label">Formato</div>
+                <input class="field-input" id="evento-formato" placeholder="Online ao vivo">
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-label">Duração</div>
+              <input class="field-input" id="evento-duracao" placeholder="3 dias">
+            </div>
+          </div>
+
+          <!-- COPY -->
+          <div class="panel" style="margin-top:1rem">
+            <div class="panel-title">Copy</div>
+            <div class="field">
+              <div class="field-label">Headline principal</div>
+              <textarea class="field-input" id="copy-headline" oninput="updatePreview()"
+                placeholder="Como Dominar a Reforma Tributária e se Tornar Referência no Mercado Jurídico em 3 Dias"></textarea>
+            </div>
+            <div class="field">
+              <div class="field-label">Subheadline</div>
+              <textarea class="field-input" id="copy-sub" oninput="updatePreview()"
+                placeholder="Imersão ao vivo com o Prof. Dr. Alessandro Spilborghs para advogados que querem sair na frente"></textarea>
+            </div>
+            <div class="grid2">
+              <div class="field">
+                <div class="field-label">CTA principal</div>
+                <input class="field-input" id="copy-cta" oninput="updatePreview()" placeholder="Garantir minha vaga agora">
+              </div>
+              <div class="field">
+                <div class="field-label">CTA bio/links</div>
+                <input class="field-input" id="copy-ctaBio" placeholder="Saiba mais sobre a Imersão">
+              </div>
+            </div>
+          </div>
+
+          <!-- PREÇO -->
+          <div class="panel" style="margin-top:1rem">
+            <div class="panel-title">Preço</div>
+            <div class="grid3">
+              <div class="field">
+                <div class="field-label">Valor cheio</div>
+                <input class="field-input" id="preco-valor" oninput="updatePreview()" placeholder="997">
+              </div>
+              <div class="field">
+                <div class="field-label">Nº parcelas</div>
+                <input class="field-input" id="preco-numParcelas" oninput="updatePreview()" placeholder="12">
+              </div>
+              <div class="field">
+                <div class="field-label">Valor parcela</div>
+                <input class="field-input" id="preco-parcela" oninput="updatePreview()" placeholder="97">
+              </div>
+            </div>
+            <div class="grid2">
+              <div class="field">
+                <div class="field-label">Valor à vista</div>
+                <input class="field-input" id="preco-avista" oninput="updatePreview()" placeholder="797">
+              </div>
+              <div class="field">
+                <div class="field-label">Texto do botão de preço</div>
+                <input class="field-input" id="preco-ctaTexto" placeholder="Quero garantir minha vaga">
+              </div>
+            </div>
+          </div>
+
+          <!-- LINKS -->
+          <div class="panel" style="margin-top:1rem">
+            <div class="panel-title">Links</div>
+            <div class="field">
+              <div class="field-label">Link de checkout</div>
+              <input class="field-input" id="link-checkout" placeholder="https://pay.hotmart.com/...">
+            </div>
+            <div class="section-label">WhatsApp</div>
+            <div class="grid2">
+              <div class="field">
+                <div class="field-label">Número (com DDI, sem símbolos)</div>
+                <input class="field-input" id="wa-numero" oninput="updateWaLink()" placeholder="5511999999999">
+              </div>
+              <div class="field">
+                <div class="field-label">Mensagem pré-preenchida</div>
+                <input class="field-input" id="wa-mensagem" oninput="updateWaLink()"
+                  placeholder="Olá! Tenho interesse na Imersão Reforma Tributária">
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-label">CTA WhatsApp</div>
+              <input class="field-input" id="copy-ctaWa" placeholder="Falar com a equipe">
+            </div>
+            <div class="wa-preview" id="wa-preview" style="display:none">
+              <span class="wa-link" id="wa-link-text"></span>
+              <button class="btn-test" onclick="testarWa()">Testar</button>
+            </div>
+          </div>
+
+          <!-- VERSÃO -->
+          <div class="panel" style="margin-top:1rem">
+            <div class="panel-title">Versão A/B</div>
+            <div class="field">
+              <div class="field-label">Versão ativa desta configuração</div>
+              <select class="field-input" id="versao">
+                <option value="A">Versão A</option>
+                <option value="B">Versão B</option>
+                <option value="C">Versão C</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- PREVIEW -->
+        <div class="preview-wrap">
+          <div class="panel">
+            <div class="panel-title">Preview</div>
+            <div class="preview-phone">
+              <div class="ph-bar"><div class="ph-dot"></div></div>
+              <div class="ph-hero">
+                <div class="ph-hero-text" id="ph-event">IMERSÃO AO VIVO</div>
+              </div>
+              <div class="ph-body">
+                <div class="ph-tag" id="ph-tag">25 de abril · 19h</div>
+                <div class="ph-h1" id="ph-h1">Sua headline aparecerá aqui</div>
+                <div class="ph-sub" id="ph-sub">Subheadline da página de vendas</div>
+                <div class="ph-price">
+                  <div class="ph-price-val" id="ph-price">12x R$ 97</div>
+                  <div class="ph-price-sub" id="ph-avista">ou R$ 797 à vista</div>
+                </div>
+                <div class="ph-btn" id="ph-cta">Garantir minha vaga</div>
+                <div class="ph-wa" id="ph-wa">Falar com a equipe</div>
+              </div>
+            </div>
+
+            <div style="margin-top:1rem">
+              <div class="panel-title" style="margin-bottom:0.75rem">Versões</div>
+              <div class="ver-list" id="ver-list">
+                <div class="ver-item active-ver">
+                  <div>
+                    <div class="ver-name">Versão A</div>
+                    <div class="ver-conv">— sem dados ainda</div>
+                  </div>
+                  <span class="ver-badge live">ao vivo</span>
+                </div>
+              </div>
+              <button class="btn-ghost" style="width:100%;margin-top:8px;font-size:0.75rem"
+                onclick="switchTab('versoes')">
+                Gerenciar versões →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: FORMULÁRIO ── -->
+  <div class="tab-content" id="tab-formulario">
+    <div class="content">
+      <div class="panel" style="margin-bottom:1rem">
+        <div class="panel-title">Embed do formulário externo</div>
+        <div class="field">
+          <div class="field-label">Cole o HTML do formulário (Builderall, RD Station, ActiveCampaign...)</div>
+          <textarea class="field-input" id="form-embed" style="min-height:120px;font-family:var(--mono);font-size:0.75rem"
+            placeholder="<form action=&quot;https://...mailingboss...&quot; method=&quot;post&quot;>..."></textarea>
+        </div>
+        <div class="field">
+          <div class="field-label">Seletor do formulário (para o script de captura)</div>
+          <input class="field-input" id="form-selector" placeholder="form[action*=&quot;mailingboss&quot;]"
+            value="form[action*=&quot;mailingboss&quot;]">
+        </div>
+        <div class="field">
+          <div class="field-label">Posição na página</div>
+          <select class="field-input" id="form-posicao">
+            <option value="before-cta">Antes do CTA principal</option>
+            <option value="after-benefits">Após os benefícios</option>
+            <option value="popup">Pop-up com delay</option>
+            <option value="bottom">Final da página</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-bottom:1rem">
+        <div class="panel-title">Campos do formulário</div>
+        <div class="field-label" style="margin-bottom:8px">Campos presentes no formulário</div>
+        <div class="checkbox-group" id="form-campos">
+          <div class="chip on" data-field="FNAME">Nome (FNAME)</div>
+          <div class="chip on" data-field="EMAIL">E-mail (EMAIL)</div>
+          <div class="chip on" data-field="PHONE">Telefone (PHONE)</div>
+          <div class="chip" data-field="LNAME">Sobrenome (LNAME)</div>
+          <div class="chip" data-field="WHATSAPP">WhatsApp</div>
+          <div class="chip" data-field="CPF">CPF</div>
+        </div>
+        <div class="section-label">IDs dos campos hidden de UTM</div>
+        <div class="grid3">
+          <div class="field">
+            <div class="field-label">UTM Source</div>
+            <input class="field-input" id="utm-source-id" value="UTM_SOURCE" placeholder="UTM_SOURCE">
+          </div>
+          <div class="field">
+            <div class="field-label">UTM Medium</div>
+            <input class="field-input" id="utm-medium-id" value="UTM_MEDIUM" placeholder="UTM_MEDIUM">
+          </div>
+          <div class="field">
+            <div class="field-label">UTM Campaign</div>
+            <input class="field-input" id="utm-campaign-id" value="UTM_CAMPAIGN" placeholder="UTM_CAMPAIGN">
+          </div>
+          <div class="field">
+            <div class="field-label">UTM Content</div>
+            <input class="field-input" id="utm-content-id" value="UTM_CONTENT" placeholder="UTM_CONTENT">
+          </div>
+          <div class="field">
+            <div class="field-label">UTM Term</div>
+            <input class="field-input" id="utm-term-id" value="UTM_TERM" placeholder="UTM_TERM">
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-bottom:1rem">
+        <div class="panel-title">Webhook de captura (N8N)</div>
+        <div class="field">
+          <div class="field-label">URL do webhook</div>
+          <input class="field-input" id="webhook-url" placeholder="https://n8n.seudominio.com/webhook/inscricao">
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <div class="field-label">Origem</div>
+            <input class="field-input" id="webhook-origem" placeholder="organico" value="organico">
+          </div>
+          <div class="field">
+            <div class="field-label">Código do lançamento</div>
+            <input class="field-input" id="webhook-lancamento" placeholder="NSD_LC_01">
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Script gerado (somente leitura — atualiza ao salvar)</div>
+          <textarea class="field-input" id="script-gerado" style="min-height:140px;font-family:var(--mono);font-size:0.72rem;color:var(--text3)" readonly
+            placeholder="O script será gerado aqui após preencher os campos acima..."></textarea>
+        </div>
+        <button class="btn-ai" onclick="gerarScript()" style="margin-top:4px">Visualizar script</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: IMAGENS ── -->
+  <div class="tab-content" id="tab-imagens">
+    <div class="content">
+      <div class="panel-grid">
+        <div class="panel">
+          <div class="panel-title">Foto do expert</div>
+          <div class="upload-zone" onclick="document.getElementById('upload-expert').click()">
+            <input type="file" id="upload-expert" accept="image/*" onchange="handleUpload(this,'expert')">
+            <div class="upload-icon">👤</div>
+            <div class="upload-label">Clique para enviar a foto do expert</div>
+            <div class="upload-sub">JPG, PNG ou WEBP · máx 2MB</div>
+          </div>
+          <img class="img-preview" id="preview-expert">
+          <div class="img-url-copy" id="url-expert" onclick="copyUrl('expert')">
+            Clique para copiar a URL
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Imagem de destaque (OG / hero)</div>
+          <div class="upload-zone" onclick="document.getElementById('upload-og').click()">
+            <input type="file" id="upload-og" accept="image/*" onchange="handleUpload(this,'og')">
+            <div class="upload-icon">🖼</div>
+            <div class="upload-label">Clique para enviar a imagem OG</div>
+            <div class="upload-sub">Recomendado: 1200×630px</div>
+          </div>
+          <img class="img-preview" id="preview-og">
+          <div class="img-url-copy" id="url-og" onclick="copyUrl('og')">
+            Clique para copiar a URL
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Outras imagens</div>
+          <div class="upload-zone" onclick="document.getElementById('upload-extra').click()">
+            <input type="file" id="upload-extra" accept="image/*" onchange="handleUpload(this,'extra')">
+            <div class="upload-icon">+</div>
+            <div class="upload-label">Enviar imagem adicional</div>
+            <div class="upload-sub">Certificado, banner, logos...</div>
+          </div>
+          <img class="img-preview" id="preview-extra">
+          <div class="img-url-copy" id="url-extra" onclick="copyUrl('extra')">
+            Clique para copiar a URL
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: PIXELS & SCRIPTS ── -->
+  <div class="tab-content" id="tab-pixels">
+    <div class="content">
+      <div class="panel" style="margin-bottom:1rem">
+        <div class="panel-title">Pixels de rastreamento</div>
+        <div class="grid2">
+          <div class="field">
+            <div class="field-label">Meta Pixel ID</div>
+            <input class="field-input" id="pixel-meta" placeholder="1234567890123456">
+          </div>
+          <div class="field">
+            <div class="field-label">Google Tag ID</div>
+            <input class="field-input" id="pixel-gtag" placeholder="G-XXXXXXXXXX">
+          </div>
+          <div class="field">
+            <div class="field-label">Google Tag Manager</div>
+            <input class="field-input" id="pixel-gtm" placeholder="GTM-XXXXXXX">
+          </div>
+          <div class="field">
+            <div class="field-label">Hotmart Pixel</div>
+            <input class="field-input" id="pixel-hotmart" placeholder="hotmart_pixel_id">
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Scripts personalizados</div>
+        <div class="field">
+          <div class="field-label">Script no &lt;head&gt; (antes do &lt;/head&gt;)</div>
+          <textarea class="field-input" id="script-head" style="min-height:100px;font-family:var(--mono);font-size:0.75rem"
+            placeholder="<!-- Scripts de rastreamento, fontes, etc. -->"></textarea>
+        </div>
+        <div class="field">
+          <div class="field-label">Script no &lt;body&gt; (antes do &lt;/body&gt;)</div>
+          <textarea class="field-input" id="script-body" style="min-height:100px;font-family:var(--mono);font-size:0.75rem"
+            placeholder="<!-- Chat, popups, scripts de conversão, etc. -->"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: DASHBOARD ── -->
+  <div class="tab-content" id="tab-dashboard">
+    <div class="content">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+        <div style="font-size:0.83rem;color:var(--text2)">Dados do Supabase NSD em tempo real</div>
+        <div style="display:flex;gap:8px">
+          <select class="field-input" id="dash-periodo" style="width:auto" onchange="loadDashboard()">
+            <option value="7">Últimos 7 dias</option>
+            <option value="30" selected>Últimos 30 dias</option>
+            <option value="90">Últimos 90 dias</option>
+          </select>
+          <button class="btn-ghost" onclick="loadDashboard()" style="font-size:0.75rem">↻ Atualizar</button>
+        </div>
+      </div>
+
+      <div class="metrics-grid" id="dash-metrics">
+        <div class="metric-card">
+          <div class="metric-label">Visitas</div>
+          <div class="metric-value" id="m-visitas">—</div>
+          <div class="metric-sub" id="m-visitas-sub">carregando...</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Cliques CTA</div>
+          <div class="metric-value" id="m-cliques">—</div>
+          <div class="metric-sub" id="m-cliques-sub">carregando...</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Conversões</div>
+          <div class="metric-value" id="m-conv">—</div>
+          <div class="metric-sub" id="m-conv-sub">carregando...</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Taxa de conversão</div>
+          <div class="metric-value" id="m-taxa">—%</div>
+          <div class="metric-sub" id="m-taxa-sub">cliques / visitas</div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-bottom:1rem">
+        <div class="panel-title">Origem do tráfego</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>UTM Source</th>
+                <th>UTM Campaign</th>
+                <th>Visitas</th>
+                <th>Conversões</th>
+                <th>Taxa</th>
+              </tr>
+            </thead>
+            <tbody id="dash-utm-table">
+              <tr><td colspan="5" style="text-align:center;color:var(--text3)">carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Leads recentes</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Origem</th>
+                <th>Data</th>
+                <th>Versão</th>
+              </tr>
+            </thead>
+            <tbody id="dash-leads-table">
+              <tr><td colspan="5" style="text-align:center;color:var(--text3)">carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: VERSÕES A/B ── -->
+  <div class="tab-content" id="tab-versoes">
+    <div class="content">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+        <div style="font-size:0.83rem;color:var(--text2)">Gerencie e compare as variações da página</div>
+        <button class="btn-ghost" onclick="novaVersao()">+ Nova versão</button>
+      </div>
+      <div id="versoes-lista">
+        <div class="panel" style="margin-bottom:1rem">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+            <div>
+              <div style="font-size:0.9rem;font-weight:600;color:var(--text)">Versão A — Urgência</div>
+              <div style="font-size:0.72rem;color:var(--text3);margin-top:2px">Criada em 01/04/2025 · ao vivo</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span class="ver-badge live">ao vivo</span>
+              <button class="btn-ghost" style="font-size:0.72rem" onclick="editarVersao('A')">Editar</button>
+            </div>
+          </div>
+          <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr)">
+            <div class="metric-card">
+              <div class="metric-label">Visitas</div>
+              <div class="metric-value" style="font-size:1.2rem">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Cliques</div>
+              <div class="metric-value" style="font-size:1.2rem">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Conversões</div>
+              <div class="metric-value" style="font-size:1.2rem">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Taxa</div>
+              <div class="metric-value metric-up" style="font-size:1.2rem">—%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-status">
+      <div class="dot" id="footer-dot"></div>
+      <span id="footer-status-text">Pronto para publicar</span>
+    </div>
+    <div class="footer-btns">
+      <button class="btn-ghost" onclick="abrirPreview()">Abrir site</button>
+      <button class="btn-ghost" onclick="gerarScript()">Visualizar script</button>
+      <button class="btn-save" id="btn-salvar" onclick="salvarEPublicar()">
+        ✦ Salvar e publicar
+      </button>
+    </div>
+  </div>
+
+  <!-- DEPLOY LOG -->
+  <div style="position:fixed;bottom:70px;left:50%;transform:translateX(-50%);width:90%;max-width:500px;z-index:200">
+    <div class="deploy-log" id="deploy-log"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ═══════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ══════════════════════════════════════════
+// CONFIG — substitua os placeholders
+// ══════════════════════════════════════════
+const CFG = {
+  // Supabase AUREN (auth + permissões)
+  AUREN_URL:      'https://wfqtxigxgthogrfcspfp.supabase.co',
+  AUREN_ANON:     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndmcXR4aWd4Z3Rob2dyZmNzcGZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTM3OTEsImV4cCI6MjA5MDgyOTc5MX0.gH1Rp8e2rmeOgT3H2DGmLu8RS5YKHfB8wo4wXZN0dPc',
+
+  // Supabase NSD (dados de rastreamento)
+  NSD_URL:        'https://hvggjnzwydomielffqlr.supabase.co',
+  NSD_ANON:       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2Z2dqbnp3eWRvbWllbGZmcWxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2MDc5MjIsImV4cCI6MjA5MTE4MzkyMn0.TO5IbVP3l_Ssk5DjYVeVmYW0hoCHjKUJf-YghQOoccc',
+  NSD_SERVICE:    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2Z2dqbnp3eWRvbWllbGZmcWxyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTYwNzkyMiwiZXhwIjoyMDkxMTgzOTIyfQ.QtAbJ-zIHcHsFPMAMW4yKhN0g7ufEimJnIm1-ds-fWM',
+
+  // GitHub
+  GITHUB_TOKEN:   null, // carregado do Supabase em runtime
+  GITHUB_REPO:    'regisnak/nsd',
+  GITHUB_BRANCH:  'main',
+  GITHUB_FILE:    'config.js',
+
+  // Easypanel
+
+  // Permissão necessária no Auren
+  PERMISSAO:      'admin_nsd',
+
+  // Site do NSD
+  SITE_URL:       'https://foconareformatributaria.com.br',
+};
+
+// ══════════════════════════════════════════
+// SUPABASE CLIENTS
+// ══════════════════════════════════════════
+const sbAuren = supabase.createClient(CFG.AUREN_URL, CFG.AUREN_ANON);
+const sbNSD   = supabase.createClient(CFG.NSD_URL,   CFG.NSD_SERVICE);
+
+// ══════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════
+async function doLogin(){
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-password').value;
+  const bar   = document.getElementById('login-bar');
+  const err   = document.getElementById('login-error');
+  if(!email||!pass){ showErr('Preencha e-mail e senha.'); return; }
+  bar.classList.add('visible');
+  err.style.display='none';
+  try{
+    const {data,error} = await sbAuren.auth.signInWithPassword({email,password:pass});
+    if(error) throw error;
+    const ok = await checkPermissao(data.user.id);
+    if(!ok){ await sbAuren.auth.signOut(); throw new Error('Sem permissão para acessar este painel.'); }
+    showApp();
+  }catch(e){
+    showErr(e.message);
+  }finally{
+    bar.classList.remove('visible');
+  }
+}
+
+function showErr(msg){
+  const el = document.getElementById('login-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+async function checkPermissao(userId){
+  const {data} = await sbAuren.from('profiles').select('access').eq('id',userId).single();
+  if(!data) return false;
+  const access = data.access || [];
+  return access.includes(CFG.PERMISSAO) || access.includes('owner');
+}
+
+async function doLogout(){
+  await sbAuren.auth.signOut();
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+}
+
+async function showApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  await loadConfig();
+  await loadDashboard();
+  updatePreview();
+  checkSiteStatus();
+}
+
+// Verifica sessão ao carregar
+(async()=>{
+  const {data:{session}} = await sbAuren.auth.getSession();
+  if(session){
+    const ok = await checkPermissao(session.user.id);
+    if(ok){ showApp(); return; }
+  }
+})();
+
+// ══════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    const names=['editor','formulario','imagens','pixels','dashboard','versoes'];
+    t.classList.toggle('active', names[i]===name);
+  });
+  document.querySelectorAll('.tab-content').forEach(c=>{
+    c.classList.toggle('active', c.id==='tab-'+name);
+  });
+  if(name==='dashboard') loadDashboard();
+}
+
+// ══════════════════════════════════════════
+// PREVIEW
+// ══════════════════════════════════════════
+function updatePreview(){
+  const h = document.getElementById('copy-headline')?.value || 'Sua headline aqui';
+  const s = document.getElementById('copy-sub')?.value || 'Subheadline da página';
+  const c = document.getElementById('copy-cta')?.value || 'Garantir minha vaga';
+  const p = document.getElementById('preco-numParcelas')?.value || '12';
+  const pv= document.getElementById('preco-parcela')?.value || '97';
+  const av= document.getElementById('preco-avista')?.value || '797';
+  const wa= document.getElementById('copy-ctaWa')?.value || 'Falar com a equipe';
+  const ev= document.getElementById('evento-nome')?.value || 'IMERSÃO AO VIVO';
+  const dt= document.getElementById('evento-data')?.value || '';
+  const hr= document.getElementById('evento-horario')?.value || '';
+
+  const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+  set('ph-event', ev.toUpperCase().substring(0,20));
+  set('ph-tag', (dt?dt+' · ':'')+hr);
+  set('ph-h1', h.substring(0,80));
+  set('ph-sub', s.substring(0,100));
+  set('ph-price', p+'x R$ '+pv);
+  set('ph-avista', 'ou R$ '+av+' à vista');
+  set('ph-cta', c);
+  set('ph-wa', wa);
+}
+
+function updateWaLink(){
+  const num = document.getElementById('wa-numero').value.replace(/\D/g,'');
+  const msg = document.getElementById('wa-mensagem').value;
+  const prev = document.getElementById('wa-preview');
+  const link = document.getElementById('wa-link-text');
+  if(num){
+    const url = 'https://wa.me/'+num+(msg?'?text='+encodeURIComponent(msg):'');
+    link.textContent = url;
+    prev.style.display='flex';
+  } else {
+    prev.style.display='none';
+  }
+}
+
+function testarWa(){
+  const num = document.getElementById('wa-numero').value.replace(/\D/g,'');
+  const msg = document.getElementById('wa-mensagem').value;
+  if(num) window.open('https://wa.me/'+num+(msg?'?text='+encodeURIComponent(msg):''), '_blank');
+}
+
+// ══════════════════════════════════════════
+// LOAD / SAVE CONFIG
+// ══════════════════════════════════════════
+async function loadConfig(){
+  try{
+    const url = 'https://raw.githubusercontent.com/'+CFG.GITHUB_REPO+'/'+CFG.GITHUB_BRANCH+'/'+CFG.GITHUB_FILE+'?t='+Date.now();
+    const res = await fetch(url);
+    if(!res.ok) return;
+    const txt = await res.text();
+    const match = txt.match(/const CONFIG\s*=\s*(\{[\s\S]*?\});/);
+    if(!match) return;
+    let cfg;
+    try{ cfg = eval('('+match[1]+')'); }catch(e){ return; }
+
+    const set=(id,v)=>{ const el=document.getElementById(id); if(el&&v!==undefined) el.value=v; };
+    set('evento-nome',     cfg.evento?.nome);
+    set('evento-data',     cfg.evento?.data);
+    set('evento-dataISO',  cfg.evento?.dataISO);
+    set('evento-horario',  cfg.evento?.horario);
+    set('evento-formato',  cfg.evento?.formato);
+    set('evento-duracao',  cfg.evento?.duracao);
+    set('copy-headline',   cfg.copy?.headline);
+    set('copy-sub',        cfg.copy?.subheadline);
+    set('copy-cta',        cfg.copy?.ctaPrincipal);
+    set('copy-ctaBio',     cfg.copy?.ctaBio);
+    set('copy-ctaWa',      cfg.copy?.ctaWhatsapp);
+    set('preco-valor',     cfg.preco?.valor);
+    set('preco-parcela',   cfg.preco?.parcela);
+    set('preco-numParcelas',cfg.preco?.numParcelas);
+    set('preco-avista',    cfg.preco?.avista);
+    set('preco-ctaTexto',  cfg.preco?.ctaTexto);
+    set('link-checkout',   cfg.links?.checkout);
+    set('pixel-meta',      cfg.pixels?.metaPixelID);
+    set('pixel-gtag',      cfg.pixels?.googleTagID);
+    set('pixel-hotmart',   cfg.pixels?.hotmartPixel);
+    if(cfg.versao){ document.getElementById('versao').value = cfg.versao; }
+
+    // WhatsApp — decompõe wa.me link
+    if(cfg.links?.whatsapp){
+      const waUrl = cfg.links.whatsapp;
+      const numMatch = waUrl.match(/wa\.me\/(\d+)/);
+      const msgMatch = waUrl.match(/\?text=(.+)/);
+      if(numMatch) document.getElementById('wa-numero').value = numMatch[1];
+      if(msgMatch) document.getElementById('wa-mensagem').value = decodeURIComponent(msgMatch[1]);
+    }
+
+    updatePreview();
+    updateWaLink();
+    document.getElementById('last-deploy').textContent = 'config.js carregado';
+  }catch(e){ console.warn('loadConfig:', e); }
+}
+
+function buildConfig(){
+  const g = id => document.getElementById(id)?.value?.trim() || '';
+  const num = g('wa-numero').replace(/\D/g,'');
+  const msg = g('wa-mensagem');
+  const waLink = num ? 'https://wa.me/'+num+(msg?'?text='+encodeURIComponent(msg):'') : '';
+
+  return `const CONFIG = {
+  evento: {
+    nome:     "${g('evento-nome')}",
+    data:     "${g('evento-data')}",
+    dataISO:  "${g('evento-dataISO')}",
+    horario:  "${g('evento-horario')}",
+    formato:  "${g('evento-formato')}",
+    duracao:  "${g('evento-duracao')}"
+  },
+  copy: {
+    headline:     "${g('copy-headline').replace(/"/g,'\\"')}",
+    subheadline:  "${g('copy-sub').replace(/"/g,'\\"')}",
+    ctaPrincipal: "${g('copy-cta').replace(/"/g,'\\"')}",
+    ctaBio:       "${g('copy-ctaBio').replace(/"/g,'\\"')}",
+    ctaWhatsapp:  "${g('copy-ctaWa').replace(/"/g,'\\"')}"
+  },
+  preco: {
+    valor:       "${g('preco-valor')}",
+    parcela:     "${g('preco-parcela')}",
+    numParcelas: "${g('preco-numParcelas')}",
+    avista:      "${g('preco-avista')}",
+    ctaTexto:    "${g('preco-ctaTexto').replace(/"/g,'\\"')}"
+  },
+  links: {
+    checkout:  "${g('link-checkout')}",
+    whatsapp:  "${waLink}"
+  },
+  pixels: {
+    metaPixelID:  "${g('pixel-meta')}",
+    googleTagID:  "${g('pixel-gtag')}",
+    googleTagManager: "${g('pixel-gtm')}",
+    hotmartPixel: "${g('pixel-hotmart')}"
+  },
+  scripts: {
+    head: \`${document.getElementById('script-head')?.value || ''}\`,
+    body: \`${document.getElementById('script-body')?.value || ''}\`
+  },
+  formulario: {
+    embed:      \`${document.getElementById('form-embed')?.value || ''}\`,
+    selector:   "${document.getElementById('form-selector')?.value || 'form[action*=\\"mailingboss\\"]'}",
+    posicao:    "${document.getElementById('form-posicao')?.value || 'before-cta'}",
+    webhook:    "${g('webhook-url')}",
+    origem:     "${g('webhook-origem')}",
+    lancamento: "${g('webhook-lancamento')}",
+    campos: {
+      nome:     "${g('utm-source-id') ? 'FNAME' : ''}",
+      email:    "EMAIL",
+      fone:     "PHONE",
+      utmSource:    "${g('utm-source-id')}",
+      utmMedium:    "${g('utm-medium-id')}",
+      utmCampaign:  "${g('utm-campaign-id')}",
+      utmContent:   "${g('utm-content-id')}",
+      utmTerm:      "${g('utm-term-id')}"
+    }
+  },
+  supabase: {
+    url:     "${CFG.NSD_URL}",
+    anonKey: "${CFG.NSD_ANON}"
+  },
+  versao: "${document.getElementById('versao')?.value || 'A'}"
+};`;
+}
+
+// ══════════════════════════════════════════
+// SALVAR E PUBLICAR
+// ══════════════════════════════════════════
+async function salvarEPublicar(){
+  const btn = document.getElementById('btn-salvar');
+  const log = document.getElementById('deploy-log');
+  btn.disabled = true;
+  log.innerHTML = '';
+  log.classList.add('visible');
+
+  function addLog(msg, tipo='info'){
+    const cl = tipo==='ok'?'log-ok':tipo==='err'?'log-err':'log-info';
+    log.innerHTML += `<div class="log-line ${cl}">${msg}</div>`;
+    log.scrollTop = log.scrollHeight;
+  }
+
+  try{
+    addLog('→ Buscando token de acesso...');
+    const {data:sec} = await sbAuren.from('admin_secrets').select('github_token').eq('project','nsd').single();
+    if(!sec?.github_token) throw new Error('Token não encontrado. Verifique a tabela admin_secrets.');
+    CFG.GITHUB_TOKEN = sec.github_token;
+    addLog('→ Gerando config.js...');
+    const content = buildConfig();
+
+    addLog('→ Buscando SHA do arquivo no GitHub...');
+    const shaRes = await fetch(
+      `https://api.github.com/repos/${CFG.GITHUB_REPO}/contents/${CFG.GITHUB_FILE}?ref=${CFG.GITHUB_BRANCH}`,
+      { headers:{ Authorization:'Bearer '+CFG.GITHUB_TOKEN, Accept:'application/vnd.github+json' } }
+    );
+    const shaData = await shaRes.json();
+    if(!shaRes.ok) throw new Error('GitHub: '+shaData.message);
+    const sha = shaData.sha;
+
+    addLog('→ Fazendo commit no GitHub...');
+    const commitRes = await fetch(
+      `https://api.github.com/repos/${CFG.GITHUB_REPO}/contents/${CFG.GITHUB_FILE}`,
+      {
+        method:'PUT',
+        headers:{ Authorization:'Bearer '+CFG.GITHUB_TOKEN, Accept:'application/vnd.github+json', 'Content-Type':'application/json' },
+        body: JSON.stringify({
+          message: 'admin-nsd: atualiza config.js',
+          content: btoa(unescape(encodeURIComponent(content))),
+          sha,
+          branch: CFG.GITHUB_BRANCH
+        })
+      }
+    );
+    if(!commitRes.ok){
+      const e = await commitRes.json();
+      throw new Error('GitHub commit: '+e.message);
+    }
+    addLog('✓ config.js atualizado no GitHub', 'ok');
+    addLog('✓ Easypanel detectará o commit e redeploya automaticamente', 'ok');
+    addLog('✓ Site será atualizado em ~30 segundos', 'ok');
+
+    toast('Publicado com sucesso!', 'success');
+    document.getElementById('footer-status-text').textContent = 'Publicado · '+new Date().toLocaleTimeString('pt-BR');
+
+    setTimeout(()=>{
+      log.classList.remove('visible');
+    }, 8000);
+
+  }catch(e){
+    addLog('✗ Erro: '+e.message, 'err');
+    toast('Erro ao publicar: '+e.message, 'error');
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+// ══════════════════════════════════════════
+// GERAR SCRIPT DE INSCRIÇÃO
+// ══════════════════════════════════════════
+function gerarScript(){
+  const g = id => document.getElementById(id)?.value?.trim() || '';
+  const webhook    = g('webhook-url');
+  const origem     = g('webhook-origem') || 'organico';
+  const lancamento = g('webhook-lancamento') || 'NSD_LC_01';
+  const selector   = g('form-selector') || 'form[action*="mailingboss"]';
+  const utmS  = g('utm-source-id')   || 'UTM_SOURCE';
+  const utmM  = g('utm-medium-id')   || 'UTM_MEDIUM';
+  const utmC  = g('utm-campaign-id') || 'UTM_CAMPAIGN';
+  const utmCt = g('utm-content-id')  || 'UTM_CONTENT';
+  const utmT  = g('utm-term-id')     || 'UTM_TERM';
+
+  const script = `<script>
+(function(){
+  var WEBHOOK    = '${webhook}';
+  var ORIGEM     = '${origem}';
+  var LANCAMENTO = '${lancamento}';
+
+  var params = new URLSearchParams(window.location.search);
+  var utmMap = {
+    '${utmS}':  'utm_source',
+    '${utmM}':  'utm_medium',
+    '${utmC}':  'utm_campaign',
+    '${utmCt}': 'utm_content',
+    '${utmT}':  'utm_term'
+  };
+  Object.keys(utmMap).forEach(function(fieldId){
+    var val = params.get(utmMap[fieldId]);
+    var el  = document.getElementById(fieldId);
+    if(el && val) el.value = val;
+  });
+
+  var form = document.querySelector('${selector}');
+  if(form){
+    form.addEventListener('submit', function(){
+      var data = {
+        nome:         document.getElementById('FNAME')?.value.trim()         || '',
+        email:        document.getElementById('EMAIL')?.value.trim()         || '',
+        fone:         document.getElementById('PHONE')?.value.trim()         || '',
+        utm_source:   document.getElementById('${utmS}')?.value.trim()  || params.get('utm_source')   || '',
+        utm_medium:   document.getElementById('${utmM}')?.value.trim()  || params.get('utm_medium')   || '',
+        utm_campaign: document.getElementById('${utmC}')?.value.trim()  || params.get('utm_campaign') || '',
+        utm_content:  document.getElementById('${utmCt}')?.value.trim() || params.get('utm_content')  || '',
+        utm_term:     document.getElementById('${utmT}')?.value.trim()  || params.get('utm_term')     || '',
+        origem:       ORIGEM,
+        lancamento:   LANCAMENTO,
+        timestamp:    new Date().toISOString()
+      };
+      if(navigator.sendBeacon){
+        navigator.sendBeacon(WEBHOOK, new Blob([JSON.stringify(data)], {type:'application/json'}));
+      } else {
+        fetch(WEBHOOK, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),keepalive:true}).catch(function(){});
+      }
+    });
+  }
+})();
+<\/script>`;
+
+  document.getElementById('script-gerado').value = script;
+  switchTab('formulario');
+  toast('Script gerado!', 'success');
+}
+
+// ══════════════════════════════════════════
+// IA — GERAR COPY
+// ══════════════════════════════════════════
+async function gerarIA(tipo){
+  const brief = document.getElementById('ai-brief').value.trim();
+  if(!brief){ toast('Preencha o briefing primeiro.', 'error'); return; }
+  const bar = document.getElementById('ai-bar');
+  bar.classList.add('visible');
+  document.querySelectorAll('.btn-ai').forEach(b=>b.disabled=true);
+
+  const prompts = {
+    headline: `Crie 3 opções de headline para uma página de vendas. Retorne APENAS JSON: {"headlines":["...","...","..."]}. Briefing: ${brief}`,
+    subheadline: `Crie 3 opções de subheadline (2 linhas cada). Retorne APENAS JSON: {"subs":["...","...","..."]}. Briefing: ${brief}`,
+    cta: `Crie 3 opções de CTA principal e 2 de CTA WhatsApp. Retorne APENAS JSON: {"ctas":["...","...","..."],"was":["...","..."]}. Briefing: ${brief}`,
+    beneficios: `Liste 6 benefícios/transformações em bullets curtos. Retorne APENAS JSON: {"beneficios":["...","...","...","...","...","..."]}. Briefing: ${brief}`,
+    tudo: `Crie copy completa para página de vendas. Retorne APENAS JSON: {"headline":"...","subheadline":"...","cta":"...","ctaWa":"...","beneficios":["...","...","...","...","..."]}. Briefing: ${brief}`
+  };
+
+  try{
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user',content:prompts[tipo]}]
+      })
+    });
+    const data = await res.json();
+    const raw = data.content?.[0]?.text || '{}';
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+
+    if(tipo==='tudo'){
+      if(parsed.headline) document.getElementById('copy-headline').value = parsed.headline;
+      if(parsed.subheadline) document.getElementById('copy-sub').value = parsed.subheadline;
+      if(parsed.cta) document.getElementById('copy-cta').value = parsed.cta;
+      if(parsed.ctaWa) document.getElementById('copy-ctaWa').value = parsed.ctaWa;
+      updatePreview();
+      toast('Copy gerada com sucesso!', 'success');
+    } else if(tipo==='headline' && parsed.headlines?.length){
+      document.getElementById('copy-headline').value = parsed.headlines[0];
+      updatePreview();
+      toast('Headline gerada! (1 de 3)', 'success');
+    } else if(tipo==='subheadline' && parsed.subs?.length){
+      document.getElementById('copy-sub').value = parsed.subs[0];
+      updatePreview();
+      toast('Subheadline gerada!', 'success');
+    } else if(tipo==='cta' && parsed.ctas?.length){
+      document.getElementById('copy-cta').value = parsed.ctas[0];
+      if(parsed.was?.[0]) document.getElementById('copy-ctaWa').value = parsed.was[0];
+      updatePreview();
+      toast('CTAs gerados!', 'success');
+    } else {
+      toast('Gerado! Verifique os campos.', 'success');
+    }
+  }catch(e){
+    toast('Erro na IA: '+e.message, 'error');
+  }finally{
+    bar.classList.remove('visible');
+    document.querySelectorAll('.btn-ai').forEach(b=>b.disabled=false);
+  }
+}
+
+// ══════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════
+async function loadDashboard(){
+  const dias = parseInt(document.getElementById('dash-periodo')?.value || 30);
+  const desde = new Date(Date.now() - dias*86400000).toISOString();
+
+  try{
+    const [vRes, cRes, convRes, leadsRes] = await Promise.all([
+      sbNSD.from('visitas').select('*',{count:'exact',head:true}).gte('created_at',desde),
+      sbNSD.from('cliques').select('*',{count:'exact',head:true}).gte('created_at',desde),
+      sbNSD.from('conversoes').select('*',{count:'exact',head:true}).gte('created_at',desde),
+      sbNSD.from('leads').select('nome,email,utm_source,utm_campaign,created_at,lancamento').gte('created_at',desde).order('created_at',{ascending:false}).limit(20)
+    ]);
+
+    const visitas = vRes.count || 0;
+    const cliques = cRes.count || 0;
+    const conv    = convRes.count || 0;
+    const taxa    = cliques>0 ? ((conv/cliques)*100).toFixed(1) : '0.0';
+
+    document.getElementById('m-visitas').textContent  = visitas.toLocaleString('pt-BR');
+    document.getElementById('m-cliques').textContent  = cliques.toLocaleString('pt-BR');
+    document.getElementById('m-conv').textContent     = conv.toLocaleString('pt-BR');
+    document.getElementById('m-taxa').textContent     = taxa+'%';
+    document.getElementById('m-visitas-sub').textContent = 'últimos '+dias+' dias';
+    document.getElementById('m-cliques-sub').textContent = 'nos CTAs';
+    document.getElementById('m-conv-sub').textContent    = 'obrigado.html';
+
+    // Leads table
+    const tbody = document.getElementById('dash-leads-table');
+    if(leadsRes.data?.length){
+      tbody.innerHTML = leadsRes.data.map(l=>`
+        <tr>
+          <td>${l.nome||'—'}</td>
+          <td>${l.email||'—'}</td>
+          <td><span class="badge-blue">${l.utm_source||'direto'}</span></td>
+          <td>${new Date(l.created_at).toLocaleDateString('pt-BR')}</td>
+          <td><span class="badge-amber">${l.lancamento||'—'}</span></td>
+        </tr>`).join('');
+    } else {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3)">Nenhum lead no período</td></tr>';
+    }
+
+    // UTM table — agrupa por source
+    const {data:utmData} = await sbNSD.from('leads')
+      .select('utm_source,utm_campaign').gte('created_at',desde);
+
+    const utmMap = {};
+    (utmData||[]).forEach(r=>{
+      const k = (r.utm_source||'direto')+'|'+(r.utm_campaign||'—');
+      utmMap[k] = (utmMap[k]||0)+1;
+    });
+    const utmRows = Object.entries(utmMap).sort((a,b)=>b[1]-a[1]);
+    const utmTbody = document.getElementById('dash-utm-table');
+    if(utmRows.length){
+      utmTbody.innerHTML = utmRows.map(([k,n])=>{
+        const [src,camp] = k.split('|');
+        return `<tr>
+          <td><span class="badge-blue">${src}</span></td>
+          <td>${camp}</td>
+          <td>${n}</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>`;
+      }).join('');
+    } else {
+      utmTbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3)">Sem dados de UTM</td></tr>';
+    }
+
+  }catch(e){
+    console.warn('dashboard:', e);
+  }
+}
+
+// ══════════════════════════════════════════
+// IMAGENS — SUPABASE STORAGE
+// ══════════════════════════════════════════
+async function handleUpload(input, tipo){
+  const file = input.files[0];
+  if(!file) return;
+  if(file.size > 2*1024*1024){ toast('Arquivo maior que 2MB.','error'); return; }
+
+  toast('Enviando imagem...', 'info');
+  const ext = file.name.split('.').pop();
+  const path = `nsd/${tipo}-${Date.now()}.${ext}`;
+
+  const {error} = await sbNSD.storage.from('imagens').upload(path, file, {upsert:true});
+  if(error){ toast('Erro no upload: '+error.message,'error'); return; }
+
+  const {data} = sbNSD.storage.from('imagens').getPublicUrl(path);
+  const url = data.publicUrl;
+
+  document.getElementById('preview-'+tipo).src = url;
+  document.getElementById('preview-'+tipo).style.display='block';
+  document.getElementById('url-'+tipo).textContent = url;
+  document.getElementById('url-'+tipo).style.display='block';
+  toast('Imagem enviada!','success');
+}
+
+function copyUrl(tipo){
+  const url = document.getElementById('url-'+tipo).textContent;
+  navigator.clipboard.writeText(url).then(()=>toast('URL copiada!','success'));
+}
+
+// ══════════════════════════════════════════
+// UTILITÁRIOS
+// ══════════════════════════════════════════
+function toast(msg, tipo='info'){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show '+(tipo==='success'?'success':tipo==='error'?'error':'');
+  setTimeout(()=>{ el.className=''; }, 3000);
+}
+
+function abrirPreview(){
+  window.open(CFG.SITE_URL, '_blank');
+}
+
+async function checkSiteStatus(){
+  try{
+    const r = await fetch(CFG.SITE_URL+'?t='+Date.now(),{mode:'no-cors'});
+    document.getElementById('site-dot').classList.remove('off');
+    document.getElementById('site-status').textContent = 'Site no ar';
+  }catch(e){
+    document.getElementById('site-dot').classList.add('off');
+    document.getElementById('site-status').textContent = 'Verificando...';
+  }
+}
+
+// Chips de campos do formulário
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.chip').forEach(c=>{
+    c.addEventListener('click',()=>c.classList.toggle('on'));
+  });
+  updatePreview();
+  updateWaLink();
+});
+</script>
+</body>
+</html>
