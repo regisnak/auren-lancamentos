@@ -235,6 +235,7 @@ select.fi option{background:var(--surface2)}
     <div class="sb-list" id="sb-list"><div style="text-align:center;color:var(--text3);font-size:0.75rem;padding:2rem 0">Carregando...</div></div>
     <div class="sb-nav">
       <button class="sb-tab active" onclick="showPanel('chat')" id="tab-chat">Chat</button>
+      <button class="sb-tab" onclick="showPanel('briefings')" id="tab-briefings">Briefings</button>
       <button class="sb-tab" onclick="showPanel('cfg')" id="tab-cfg">Config</button>
       <button class="sb-tab" onclick="showPanel('utm')" id="tab-utm">UTMs</button>
       <button class="sb-tab" onclick="showPanel('equipe')" id="tab-equipe">Equipe</button>
@@ -369,6 +370,11 @@ select.fi option{background:var(--surface2)}
   </div>
 </div>
 
+<!-- BRIEFINGS PANEL (inside main) -->
+<script>
+// Briefings panel will be added dynamically to main
+</script>
+
 <!-- MODAL UTM -->
 <div id="modal-utm" style="display:none">
   <div class="modal-ov" onclick="if(event.target===this)closeUTMModal()">
@@ -431,6 +437,7 @@ select.fi option{background:var(--surface2)}
         </div>
       </div>
       <div class="field"><div class="field-label">Slug da URL</div><input class="fi" id="m-slug" placeholder="reforma-tributaria" oninput="upPrev()"><div class="url-prev"><span id="pdom"></span>/<em id="pslug">slug</em></div></div>
+      <div class="field"><div class="field-label">Briefing do evento</div><select class="fi" id="m-briefing"><option value="">Selecione um briefing...</option></select></div>
       <div class="field"><div class="field-label">Tag do lançamento</div><input class="fi" id="m-tag" placeholder="NSD_LC_01"></div>
       <div class="field"><div class="field-label">Link de checkout (se aplicável)</div><input class="fi" id="m-co" placeholder="https://pay.hotmart.com/..."></div>
       <div class="field"><div class="field-label">Link do grupo WhatsApp (se aplicável)</div><input class="fi" id="m-gwa" placeholder="https://chat.whatsapp.com/..."></div>
@@ -438,6 +445,36 @@ select.fi option{background:var(--surface2)}
       <div style="display:flex;gap:8px;margin-top:1rem;justify-content:flex-end">
         <button class="btn-g" onclick="closeModal()">Cancelar</button>
         <button class="btn-s" onclick="createSite()">Criar e começar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BRIEFING -->
+<div id="modal-briefing" style="display:none">
+  <div class="modal-ov" onclick="if(event.target===this)closeModalBriefing()">
+    <div class="modal" style="max-width:640px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem">
+        <div class="modal-t" style="margin:0">📋 Briefing do evento</div>
+        <button class="btn-g" onclick="closeModalBriefing()" style="font-size:0.72rem">Fechar</button>
+      </div>
+      <div class="field"><div class="field-label">Nome do evento/produto *</div><input class="fi" id="b-nome" placeholder="ex: Imersão Certificação na Reforma Tributária"></div>
+      <div class="field"><div class="field-label">Promessa principal *</div><textarea class="fi" id="b-promessa" placeholder="Em 1 sábado, você sai com clareza técnica para orientar qualquer cliente."></textarea></div>
+      <div class="field"><div class="field-label">Público-alvo exato</div><input class="fi" id="b-publico" placeholder="Advogados, contabilistas e gestores"></div>
+      <div class="field"><div class="field-label">Transformação prática (o que a pessoa sai sabendo/fazendo)</div><textarea class="fi" id="b-transformacao" placeholder="Sair da imersão sabendo orientar qualquer cliente sobre a Reforma com segurança técnica..."></textarea></div>
+      <div class="field"><div class="field-label">Entregáveis (o que recebe ao comprar)</div><textarea class="fi" id="b-entregaveis" placeholder="Imersão 6h ao vivo, certificado NSD, acesso ao grupo exclusivo..."></textarea></div>
+      <div class="field"><div class="field-label">Bônus</div><textarea class="fi" id="b-bonus" placeholder="Gravação por 7 dias, material de apoio com slides e resumos..."></textarea></div>
+      <div class="field"><div class="field-label">Provas sociais (depoimentos, números, resultados)</div><textarea class="fi" id="b-provas" placeholder="Não tem ainda — compensar com autoridade e especificidade da oferta..."></textarea></div>
+      <div class="field"><div class="field-label">Expert — autoridade resumida</div><textarea class="fi" id="b-expert" placeholder="Alessandro Spilborghs — advogado tributarista, mestre em Direito Político-Econômico..."></textarea></div>
+      <div class="field"><div class="field-label">Dor principal do público (linguagem crua)</div><textarea class="fi" id="b-dor" placeholder="O cliente pergunta sobre a Reforma e o advogado trava. Medo de perder credibilidade e clientes..."></textarea></div>
+      <div class="field"><div class="field-label">Para quem É (checklist)</div><textarea class="fi" id="b-para-quem-e" placeholder="Quer entender a Reforma de forma prática&#10;Busca se posicionar antes de saturar&#10;Atende clientes com imóveis ou empresas..."></textarea></div>
+      <div class="field"><div class="field-label">Para quem NÃO É</div><textarea class="fi" id="b-para-quem-nao" placeholder="Acha que só vai importar lá na frente&#10;Quer conteúdo superficial&#10;Busca atalhos sem base técnica..."></textarea></div>
+      <div class="field"><div class="field-label">Urgência real</div><textarea class="fi" id="b-urgencia" placeholder="Data fixa 18/04 — sem replay. Janela competitiva de 2026..."></textarea></div>
+      <div class="field"><div class="field-label">Garantia</div><input class="fi" id="b-garantia" placeholder="7 dias"></div>
+      <div class="field"><div class="field-label">Dados do rodapé (empresa, CNPJ, e-mail, WhatsApp)</div><textarea class="fi" id="b-rodape" placeholder="NSD — Núcleo Superior de Direito&#10;CNPJ: ...&#10;suporte@...&#10;WhatsApp: ..."></textarea></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1rem">
+        <button class="btn-g" onclick="closeModalBriefing()">Cancelar</button>
+        <button class="btn-s" onclick="salvarBriefing()">Salvar briefing</button>
       </div>
     </div>
   </div>
@@ -504,6 +541,7 @@ async function initApp(){
   const _cfgDom=document.getElementById('cfg-dom'); if(_cfgDom) _cfgDom.value=PROJ.dominio;
   await loadCreds();
   await loadSites();
+  await loadBriefings();
   await loadUTMs();
   await loadCfg();
   checkStatus();
@@ -703,8 +741,9 @@ function showPanel(n){
   document.getElementById('panel-chat').style.display=n==='chat'?'flex':'none';
   document.getElementById('panel-cfg').style.display=n==='cfg'?'flex':'none';
   document.getElementById('panel-utm').style.display=n==='utm'?'flex':'none';
-  ['chat','cfg','utm','equipe'].forEach(t=>document.getElementById('tab-'+t)?.classList.toggle('active',t===n));
+  ['chat','cfg','utm','equipe','briefings'].forEach(t=>document.getElementById('tab-'+t)?.classList.toggle('active',t===n));
   if(n==='equipe') loadEquipe();
+  if(n==='briefings') loadBriefings();
 }
 
 let tipoSel='captura';
@@ -726,7 +765,8 @@ async function createSite(){
   const wh=document.getElementById('m-wh').value.trim();
   if(!nome||!slug){ toast('Preencha nome e slug.','error'); return; }
   try{
-    const {data,error}=await sbNS.from('sites').insert({nome,tipo:tipoSel,slug,tag:tag||null,status:'rascunho',html:null,checkout_link:co||null,grupo_wa_link:gwa||null,webhook_override:wh||null}).select().single();
+    const brifId=document.getElementById('m-briefing')?.value||null;
+    const {data,error}=await sbNS.from('sites').insert({nome,tipo:tipoSel,slug,tag:tag||null,status:'rascunho',html:null,checkout_link:co||null,grupo_wa_link:gwa||null,webhook_override:wh||null,briefing_id:brifId||null}).select().single();
     if(error) throw error;
     closeModal();
     await loadSites();
@@ -1008,6 +1048,123 @@ async function removerUsuario(uid, nome){
     loadEquipe();
   }catch(e){ toast('Erro: '+e.message,'error'); }
 }
+
+// ══════════════════════════════════════════
+// BRIEFINGS
+// ══════════════════════════════════════════
+let briefings = [], editingBriefingId = null;
+
+async function loadBriefings(){
+  try{
+    const {data} = await sbNS.from('briefings').select('*').order('created_at',{ascending:false});
+    briefings = data||[];
+    renderBriefings();
+    populateBriefingSelects();
+  }catch(e){ console.warn('briefings',e); }
+}
+
+function renderBriefings(){
+  const el = document.getElementById('briefings-lista');
+  if(!el) return;
+  if(!briefings.length){
+    el.innerHTML='<div style="text-align:center;color:var(--text3);font-size:0.75rem;padding:2rem 0">Nenhum briefing criado ainda.<br>Crie um briefing por evento/produto.</div>';
+    return;
+  }
+  el.innerHTML = briefings.map((b,i) => `
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+        <div style="flex:1">
+          <div style="font-size:0.88rem;font-weight:600;color:var(--text);margin-bottom:3px">${b.nome}</div>
+          <div style="font-size:0.75rem;color:var(--text3);line-height:1.5">${(b.promessa||'').substring(0,120)}${b.promessa&&b.promessa.length>120?'...':''}</div>
+          ${b.publico?'<div style="font-size:0.7rem;color:var(--blue);margin-top:4px">👥 '+b.publico+'</div>':''}
+        </div>
+        <div style="display:flex;gap:5px;flex-shrink:0">
+          <button class="btn-g" style="font-size:0.7rem" onclick="editarBriefing(${i})">Editar</button>
+          <button class="btn-g" style="font-size:0.7rem;color:var(--red);border-color:rgba(248,113,113,0.3)" onclick="deletarBriefing('${b.id}')">Remover</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function populateBriefingSelects(){
+  // Populate modal de novo site
+  const sel = document.getElementById('m-briefing');
+  if(sel){
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">Selecione um briefing...</option>';
+    briefings.forEach(b => {
+      const opt = document.createElement('option');
+      opt.value = b.id;
+      opt.textContent = b.nome;
+      if(b.id === cur) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+}
+
+function openModalBriefing(briefing){
+  editingBriefingId = briefing?.id||null;
+  document.getElementById('modal-briefing').style.display='block';
+  const fields = ['nome','promessa','publico','transformacao','entregaveis','bonus','provas','expert','dor','urgencia','garantia','rodape'];
+  fields.forEach(f => {
+    const el = document.getElementById('b-'+f);
+    if(el) el.value = briefing?.[f]||'';
+  });
+  const ep = document.getElementById('b-para-quem-e');
+  const np = document.getElementById('b-para-quem-nao');
+  if(ep) ep.value = briefing?.para_quem_e||'';
+  if(np) np.value = briefing?.para_quem_nao_e||'';
+}
+
+function closeModalBriefing(){
+  document.getElementById('modal-briefing').style.display='none';
+  editingBriefingId = null;
+}
+
+function editarBriefing(i){ openModalBriefing(briefings[i]); }
+
+async function salvarBriefing(){
+  const nome = document.getElementById('b-nome').value.trim();
+  if(!nome){ toast('Preencha o nome do evento.','error'); return; }
+  const dados = {
+    nome,
+    promessa: document.getElementById('b-promessa').value.trim(),
+    publico: document.getElementById('b-publico').value.trim(),
+    transformacao: document.getElementById('b-transformacao').value.trim(),
+    entregaveis: document.getElementById('b-entregaveis').value.trim(),
+    bonus: document.getElementById('b-bonus').value.trim(),
+    provas_sociais: document.getElementById('b-provas').value.trim(),
+    expert: document.getElementById('b-expert').value.trim(),
+    dor: document.getElementById('b-dor').value.trim(),
+    para_quem_e: document.getElementById('b-para-quem-e').value.trim(),
+    para_quem_nao_e: document.getElementById('b-para-quem-nao').value.trim(),
+    urgencia: document.getElementById('b-urgencia').value.trim(),
+    garantia: document.getElementById('b-garantia').value.trim(),
+    rodape: document.getElementById('b-rodape').value.trim(),
+    updated_at: new Date().toISOString()
+  };
+  try{
+    if(editingBriefingId){
+      await sbNS.from('briefings').update(dados).eq('id',editingBriefingId);
+    } else {
+      await sbNS.from('briefings').insert(dados);
+    }
+    closeModalBriefing();
+    await loadBriefings();
+    toast('Briefing salvo!','success');
+  }catch(e){ toast('Erro: '+e.message,'error'); }
+}
+
+async function deletarBriefing(id){
+  if(!confirm('Remover este briefing?')) return;
+  try{
+    await sbNS.from('briefings').delete().eq('id',id);
+    await loadBriefings();
+    toast('Briefing removido.','success');
+  }catch(e){ toast('Erro: '+e.message,'error'); }
+}
+
+function getBriefingById(id){ return briefings.find(b=>b.id===id)||null; }
 
 function cpUrl(url){ const u=url.startsWith('http')?url:'https://'+url; navigator.clipboard.writeText(u).then(()=>toast('Copiado!','success')); }
 
