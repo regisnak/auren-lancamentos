@@ -380,21 +380,27 @@ select.fi option{background:var(--surface2)}
           <div class="field-label">Nome do grupo</div>
           <input class="fi" id="utm-group-nome" placeholder="ex: Instagram Reforma Abril">
         </div>
-        <div class="field" style="flex:1;min-width:200px;margin-bottom:0">
-          <div class="field-label">Domínio base</div>
-          <input class="fi" id="utm-group-dom" placeholder="foconareformatributaria.com.br">
+        <div class="field" style="flex:1;min-width:220px;margin-bottom:0">
+          <div class="field-label">Página destino</div>
+          <select class="fi" id="utm-page-sel" onchange="onUTMPageSelect(this)">
+            <option value="">Selecione uma página...</option>
+          </select>
         </div>
+        <input type="hidden" id="utm-group-dom" value="">
+        <input type="hidden" id="utm-group-destino" value="">
         <button class="btn-s" onclick="salvarGrupoUTM()" style="white-space:nowrap">Salvar grupo</button>
       </div>
+      <div id="utm-page-info" style="font-size:0.72rem;color:var(--text3);font-family:var(--mono);margin-bottom:0.75rem;display:none"></div>
       <div style="overflow-x:auto">
         <table class="utm-t" style="min-width:700px">
           <thead><tr>
             <th>Nome</th>
             <th>Slug redirect</th>
-            <th>Destino (slug)</th>
             <th>Source</th>
             <th>Medium</th>
             <th>Campaign</th>
+            <th>Content</th>
+            <th>Term</th>
             <th>Link gerado</th>
             <th><button class="btn-s" onclick="addLinhaUTM()" style="font-size:0.68rem;padding:3px 8px">+ Linha</button></th>
           </tr></thead>
@@ -489,9 +495,9 @@ async function initApp(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='block';
   document.getElementById('t-url').textContent = PROJ.dominio;
-  document.getElementById('pdom').textContent = PROJ.dominio;
-  document.getElementById('utm-dom').value = PROJ.dominio;
-  document.getElementById('cfg-dom').value = PROJ.dominio;
+  const _pdom=document.getElementById('pdom'); if(_pdom) _pdom.textContent=PROJ.dominio;
+  const _utmDom=document.getElementById('utm-group-dom'); if(_utmDom) _utmDom.value=PROJ.dominio;
+  const _cfgDom=document.getElementById('cfg-dom'); if(_cfgDom) _cfgDom.value=PROJ.dominio;
   await loadCreds();
   await loadSites();
   await loadUTMs();
@@ -787,7 +793,35 @@ function openUTMModal(grupo){
   utmLinhasModal=grupo?[...(grupo.utm_links||[])]:[];
   document.getElementById('utm-group-nome').value=grupo?.nome||'';
   document.getElementById('utm-group-dom').value=grupo?.dominio||PROJ.dominio;
+  document.getElementById('utm-group-destino').value=grupo?.destino_slug||'';
   window._editGrupoId=grupo?.id||null;
+  // Populate page selector
+  const sel=document.getElementById('utm-page-sel');
+  sel.innerHTML='<option value="">Selecione uma página...</option>';
+  sites.forEach(s=>{
+    const opt=document.createElement('option');
+    opt.value=JSON.stringify({dominio:PROJ.dominio,slug:'/'+s.slug});
+    opt.textContent=s.nome+' — /'+s.slug;
+    if(grupo?.destino_slug==='/'+s.slug) opt.selected=true;
+    sel.appendChild(opt);
+  });
+  // Show info if editing
+  if(grupo?.dominio){
+    const info=document.getElementById('utm-page-info');
+    info.textContent=grupo.dominio+(grupo.destino_slug||'');
+    info.style.display='block';
+  }
+  renderModalUTM();
+}
+
+function onUTMPageSelect(sel){
+  if(!sel.value){ document.getElementById('utm-page-info').style.display='none'; return; }
+  const p=JSON.parse(sel.value);
+  document.getElementById('utm-group-dom').value=p.dominio;
+  document.getElementById('utm-group-destino').value=p.slug;
+  const info=document.getElementById('utm-page-info');
+  info.textContent=p.dominio+p.slug;
+  info.style.display='block';
   renderModalUTM();
 }
 function closeUTMModal(){ document.getElementById('modal-utm').style.display='none'; utmLinhasModal=[]; window._editGrupoId=null; }
@@ -813,15 +847,19 @@ function renderModalUTM(){
     return;
   }
   const dom=document.getElementById('utm-group-dom')?.value||PROJ.dominio;
+  const _dom=document.getElementById('utm-group-dom')?.value||PROJ.dominio;
+  const destino=document.getElementById('utm-group-destino')?.value||'';
   tbody.innerHTML=utmLinhasModal.map((l,i)=>{
+    if(!l.destino_slug&&destino) l.destino_slug=destino;
     return '<tr data-idx="'+i+'">'
       +'<td><input value="'+(l.nome||'')+'" onchange="utmLinhasModal['+i+'].nome=this.value" onblur="updateUTMPreview('+i+')" placeholder="Bio Instagram"></td>'
-      +'<td><input value="'+(l.slug_redirect||'')+'" onchange="utmLinhasModal['+i+'].slug_redirect=this.value" onblur="updateUTMPreview('+i+')" placeholder="/ig-bio" style="width:80px"></td>'
-      +'<td><input value="'+(l.destino_slug||'')+'" onchange="utmLinhasModal['+i+'].destino_slug=this.value" onblur="updateUTMPreview('+i+')" placeholder="/reforma" style="width:80px"></td>'
-      +'<td><input value="'+(l.utm_source||'')+'" onchange="utmLinhasModal['+i+'].utm_source=this.value" onblur="updateUTMPreview('+i+')" placeholder="instagram" style="width:80px"></td>'
-      +'<td><input value="'+(l.utm_medium||'')+'" onchange="utmLinhasModal['+i+'].utm_medium=this.value" onblur="updateUTMPreview('+i+')" placeholder="bio" style="width:65px"></td>'
-      +'<td><input value="'+(l.utm_campaign||'')+'" onchange="utmLinhasModal['+i+'].utm_campaign=this.value" onblur="updateUTMPreview('+i+')" placeholder="reforma-abr" style="width:90px"></td>'
-      +'<td id="utm-prev-'+i+'">'+(buildUTMPreview(l,document.getElementById('utm-group-dom')?.value||PROJ.dominio))+'</td>'
+      +'<td><input value="'+(l.slug_redirect||'')+'" onchange="utmLinhasModal['+i+'].slug_redirect=this.value" onblur="updateUTMPreview('+i+')" placeholder="/ig-bio" style="width:75px"></td>'
+      +'<td><input value="'+(l.utm_source||'')+'" onchange="utmLinhasModal['+i+'].utm_source=this.value" onblur="updateUTMPreview('+i+')" placeholder="instagram" style="width:75px"></td>'
+      +'<td><input value="'+(l.utm_medium||'')+'" onchange="utmLinhasModal['+i+'].utm_medium=this.value" onblur="updateUTMPreview('+i+')" placeholder="bio" style="width:60px"></td>'
+      +'<td><input value="'+(l.utm_campaign||'')+'" onchange="utmLinhasModal['+i+'].utm_campaign=this.value" onblur="updateUTMPreview('+i+')" placeholder="reforma-abr" style="width:85px"></td>'
+      +'<td><input value="'+(l.utm_content||'')+'" onchange="utmLinhasModal['+i+'].utm_content=this.value" onblur="updateUTMPreview('+i+')" placeholder="video1" style="width:70px"></td>'
+      +'<td><input value="'+(l.utm_term||'')+'" onchange="utmLinhasModal['+i+'].utm_term=this.value" onblur="updateUTMPreview('+i+')" placeholder="advogado" style="width:70px"></td>'
+      +'<td id="utm-prev-'+i+'">'+(buildUTMPreview(l,_dom))+'</td>'
       +'<td><button class="btn-dr" onclick="utmLinhasModal.splice('+i+',1);renderModalUTM()">✕</button></td>'
       +'</tr>';
   }).join('');
@@ -832,7 +870,10 @@ function buildUTMPreview(l,dom){
   if(l.utm_source) params.push('utm_source='+encodeURIComponent(l.utm_source));
   if(l.utm_medium) params.push('utm_medium='+encodeURIComponent(l.utm_medium));
   if(l.utm_campaign) params.push('utm_campaign='+encodeURIComponent(l.utm_campaign));
-  const full='https://'+dom+(l.destino_slug||'')+(params.length?'?'+params.join('&'):'');
+  if(l.utm_content) params.push('utm_content='+encodeURIComponent(l.utm_content));
+  if(l.utm_term) params.push('utm_term='+encodeURIComponent(l.utm_term));
+  const destino=document.getElementById('utm-group-destino')?.value||l.destino_slug||'';
+  const full='https://'+dom+destino+(params.length?'?'+params.join('&'):'');
   const short=dom+(l.slug_redirect||'/slug');
   return '<div class="ulp">'+short+'</div>'
     +'<div class="ua">↓ redireciona para</div>'
@@ -853,16 +894,17 @@ async function salvarGrupoUTM(){
   if(!nome){ toast('Dê um nome ao grupo.','error'); return; }
   try{
     let gid=window._editGrupoId;
+    const destSlugGrupo=document.getElementById('utm-group-destino')?.value||'';
     if(gid){
-      await sbNS.from('utm_grupos').update({nome,dominio:dom,updated_at:new Date().toISOString()}).eq('id',gid);
+      await sbNS.from('utm_grupos').update({nome,dominio:dom,destino_slug:destSlugGrupo,updated_at:new Date().toISOString()}).eq('id',gid);
     } else {
-      const {data,error}=await sbNS.from('utm_grupos').insert({nome,dominio:dom}).select().single();
+      const {data,error}=await sbNS.from('utm_grupos').insert({nome,dominio:dom,destino_slug:destSlugGrupo}).select().single();
       if(error) throw error;
       gid=data.id;
     }
     await sbNS.from('utm_links').delete().eq('grupo_id',gid);
     if(utmLinhasModal.length){
-      const linhas=utmLinhasModal.map(l=>({grupo_id:gid,nome:l.nome,slug_redirect:l.slug_redirect,destino_slug:l.destino_slug,utm_source:l.utm_source,utm_medium:l.utm_medium,utm_campaign:l.utm_campaign}));
+      const destSlug=document.getElementById('utm-group-destino')?.value||''; const linhas=utmLinhasModal.map(l=>({grupo_id:gid,nome:l.nome,slug_redirect:l.slug_redirect,destino_slug:destSlug||l.destino_slug||'',utm_source:l.utm_source,utm_medium:l.utm_medium,utm_campaign:l.utm_campaign,utm_content:l.utm_content||null,utm_term:l.utm_term||null}));
       await sbNS.from('utm_links').insert(linhas);
     }
     closeUTMModal();
