@@ -225,7 +225,9 @@ select.fi option{background:var(--surface2)}
       <select id="sb-tipo" onchange="filterSites()">
         <option value="">Todos os tipos</option>
         <option value="captura">Captura</option>
-        <option value="vendas">Vendas</option>
+        <option value="low-ticket">Low Ticket</option>
+        <option value="lancamento">Lançamento Pago</option>
+        <option value="produto">Produto Principal</option>
         <option value="obrigado">Obrigado</option>
         <option value="vsl">VSL</option>
       </select>
@@ -420,9 +422,11 @@ select.fi option{background:var(--surface2)}
       <div class="field">
         <div class="field-label">Tipo de página</div>
         <div class="tgrid">
-          <div class="tc sel" data-tipo="captura" onclick="selTipo(this)"><div class="tc-icon">📋</div><div class="tc-name">Captura</div><div class="tc-desc">Formulário de leads</div></div>
-          <div class="tc" data-tipo="vendas" onclick="selTipo(this)"><div class="tc-icon">💰</div><div class="tc-name">Vendas</div><div class="tc-desc">Página de produto</div></div>
-          <div class="tc" data-tipo="obrigado" onclick="selTipo(this)"><div class="tc-icon">✅</div><div class="tc-name">Obrigado</div><div class="tc-desc">Pós-inscrição</div></div>
+          <div class="tc sel" data-tipo="captura" onclick="selTipo(this)"><div class="tc-icon">📋</div><div class="tc-name">Captura</div><div class="tc-desc">Inscrição gratuita</div></div>
+          <div class="tc" data-tipo="low-ticket" onclick="selTipo(this)"><div class="tc-icon">⚡</div><div class="tc-name">Low Ticket</div><div class="tc-desc">Decisão rápida, direto ao ponto</div></div>
+          <div class="tc" data-tipo="lancamento" onclick="selTipo(this)"><div class="tc-icon">🎯</div><div class="tc-name">Lançamento Pago</div><div class="tc-desc">Ingresso de evento pago</div></div>
+          <div class="tc" data-tipo="produto" onclick="selTipo(this)"><div class="tc-icon">🏆</div><div class="tc-name">Produto Principal</div><div class="tc-desc">Ticket alto, público frio</div></div>
+          <div class="tc" data-tipo="obrigado" onclick="selTipo(this)"><div class="tc-icon">✅</div><div class="tc-name">Obrigado</div><div class="tc-desc">Pós-inscrição/compra</div></div>
           <div class="tc" data-tipo="vsl" onclick="selTipo(this)"><div class="tc-icon">▶</div><div class="tc-name">VSL</div><div class="tc-desc">Vídeo de vendas</div></div>
         </div>
       </div>
@@ -530,10 +534,10 @@ async function loadSites(){
 function renderSidebar(list){
   const el = document.getElementById('sb-list');
   if(!list.length){ el.innerHTML='<div style="text-align:center;color:var(--text3);font-size:0.75rem;padding:2rem 0">Nenhum site criado ainda</div>'; return; }
-  const g={captura:[],vendas:[],obrigado:[],vsl:[]};
+  const g={captura:[],'low-ticket':[],lancamento:[],produto:[],obrigado:[],vsl:[]};
   list.forEach(s=>{ if(g[s.tipo]) g[s.tipo].push(s); });
-  const nm={captura:'Captura',vendas:'Vendas',obrigado:'Obrigado',vsl:'VSL'};
-  const bc={captura:'bc',vendas:'bv',obrigado:'bo',vsl:'bk'};
+  const nm={captura:'Captura','low-ticket':'Low Ticket',lancamento:'Lançamento Pago',produto:'Produto Principal',obrigado:'Obrigado',vsl:'VSL'};
+  const bc={captura:'bc','low-ticket':'bv',lancamento:'bv',produto:'bv',obrigado:'bo',vsl:'bk'};
   let h='';
   Object.keys(g).forEach(t=>{
     if(!g[t].length) return;
@@ -564,12 +568,15 @@ async function selSite(id){
   document.getElementById('btn-prev').style.display='flex';
   document.getElementById('btn-pub').style.display='flex';
   showPanel('chat');
+  chatHistory = [];
   const area = document.getElementById('chat-area');
   area.innerHTML='';
-  addMsg('ai',`Trabalhando em **${cur.nome}** (${cur.tipo}). O que quer fazer?`,[
-    {label:'Gerar página completa',fn:()=>genPage()},
-    {label:'Ajustar copy',fn:()=>ins('Ajusta o texto da página: ')},
-    {label:'Ver configurações',fn:()=>showPanel('cfg')}
+  const tipoLabel = {'captura':'Captura','low-ticket':'Low Ticket','lancamento':'Lançamento Pago','produto':'Produto Principal','obrigado':'Obrigado','vsl':'VSL'};
+  const label = tipoLabel[cur.tipo]||cur.tipo;
+  addMsg('ai','Trabalhando em **'+cur.nome+'** ('+label+'). O que quer criar ou ajustar?',[
+    {label:'Criar página do zero',fn:()=>genPage()},
+    {label:'Ver página atual',fn:openPreview},
+    {label:'Ajustar headline',fn:()=>ins('Muda a headline para: ')},
   ]);
 }
 
@@ -643,7 +650,15 @@ Quando for ajuste de texto: responda conversacionalmente e aplique a mudança no
 }
 
 async function genPage(){
-  document.getElementById('chat-in').value=`Crie uma página ${cur.tipo} completa para o site "${cur.nome}". Use tema escuro, responsiva, com countdown (se aplicável), hero section, benefícios, CTA destacado e rodapé. Inclua os pixels configurados no projeto.`;
+  const prompts = {
+    'captura': 'Quero criar uma página de captura de leads para este evento. Me mostre o plano antes de gerar.',
+    'low-ticket': 'Quero criar uma página de vendas low ticket para conversão rápida de público frio. Me mostre o plano antes de gerar.',
+    'lancamento': 'Quero criar uma página de vendas de ingresso para este lançamento pago. Me mostre o plano antes de gerar.',
+    'produto': 'Quero criar uma página de vendas completa do produto principal para público frio. Me mostre o plano com todas as dobras antes de gerar.',
+    'obrigado': 'Quero criar uma página de obrigado pós-inscrição. Me mostre o plano antes de gerar.',
+    'vsl': 'Quero criar uma página de VSL com vídeo centralizado. Me mostre o plano antes de gerar.'
+  };
+  document.getElementById('chat-in').value = prompts[cur.tipo] || prompts['lancamento'];
   send();
 }
 
