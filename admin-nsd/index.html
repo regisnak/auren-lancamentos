@@ -1723,12 +1723,7 @@ function renderPerguntasAdmin(){
 
 function adicionarPergunta(){
   var tipos = ['radio','escala','textarea'];
-  var tipo = prompt('Tipo da pergunta:
-1 = Múltipla escolha (radio)
-2 = Escala (0 a 5)
-3 = Texto livre
-
-Digite 1, 2 ou 3:');
+  var tipo = prompt('Tipo da pergunta: 1=Radio  2=Escala  3=Texto livre. Digite 1, 2 ou 3:');
   if(!tipo) return;
   var tipoMap = {'1':'radio','2':'escala','3':'textarea'};
   var t = tipoMap[tipo.trim()] || 'radio';
@@ -1775,92 +1770,35 @@ function editarPergunta(i){
 }
 
 function gerarScriptObrigado(){
-  var g = function(id){ var el=document.getElementById(id); return el ? el.value.trim() : ''; };
-  var webhook  = g('ob-webhook');
-  var wppLink  = g('ob-wpp-link');
-  var origem   = g('ob-origem') || 'organico';
-  var timer    = parseInt(g('ob-timer')) || 7;
-  var lancamento = g('ob-lancamento') || 'NSD_LC_01';
-  var pesquisaAtiva = document.getElementById('ob-pesquisa-ativa').checked;
+  var g = function(id){ var el=document.getElementById(id); return el?el.value.trim():''; };
+  var webhook    = g('ob-webhook');
+  var wppLink    = g('ob-wpp-link');
+  var origem     = g('ob-origem')||'organico';
+  var timer      = parseInt(g('ob-timer'))||7;
+  var lancamento = g('ob-lancamento')||'NSD_LC_01';
+  var ativa      = document.getElementById('ob-pesquisa-ativa').checked;
+  var pJson      = JSON.stringify(obPerguntas, null, 2);
 
-  var perguntasJSON = JSON.stringify(obPerguntas, null, 2);
-
-  var script = '';
-
-  if(pesquisaAtiva){
-    script = '<script>
-(function(){
-'
-      +'  var WEBHOOK   = ''+webhook+'';
-'
-      +'  var WPP_LINK  = ''+wppLink+'';
-'
-      +'  var ORIGEM    = ''+origem+'';
-'
-      +'  var LANCAMENTO= ''+lancamento+'';
-'
-      +'  var TIMER_SEC = '+timer+';
-
-'
-      +'  function getParam(name){
-'
-      +'    var src=window.location.search;
-'
-      +'    try{src=window.parent.location.search;}catch(e){}
-'
-      +'    return decodeURIComponent(new URLSearchParams(src).get(name)||'');
-'
-      +'  }
-'
-      +'  function getCookie(name){
-'
-      +'    var m=document.cookie.match('(^|;)\\s*'+name+'\\s*=\\s*([^;]+)');
-'
-      +'    return m?decodeURIComponent(m[2]):'';
-'
-      +'  }
-'
-      +'  function getUTM(n){ return getParam(n)||getCookie(n); }
-
-'
-      +'  var nome  = getParam('nome')||getCookie('lead_nome')||'';
-'
-      +'  var email = getParam('email')||getCookie('lead_email')||'';
-'
-      +'  var fone  = getParam('fone')||getCookie('lead_fone')||'';
-'
-      +'  var pNome = nome.split(' ')[0]||'você';
-
-'
-      +'  var utmSource=getUTM('utm_source'), utmMedium=getUTM('utm_medium'),
-'
-      +'      utmCampaign=getUTM('utm_campaign'), utmContent=getUTM('utm_content'),
-'
-      +'      utmTerm=getUTM('utm_term');
-
-'
-      +'  var respostas={nome:nome,email:email,fone:fone,origem:ORIGEM,lancamento:LANCAMENTO,
-'
-      +'    utm_source:utmSource,utm_medium:utmMedium,utm_campaign:utmCampaign,
-'
-      +'    utm_content:utmContent,utm_term:utmTerm};
-'
-      +'  var step=0;
-
-'
-      +'  var perguntas='+perguntasJSON+';
-
-'
-      +'  // Cole aqui o restante do script de pesquisa (render, slfNext, etc.)
-'
-      +'  // O script completo é gerado com base nas perguntas acima.
-
-'
-      +'})();
-<\/script>';
+  if(!ativa){
+    document.getElementById('ob-script-gerado').value = '(Pesquisa desativada)';
+    return;
   }
 
-  document.getElementById('ob-script-gerado').value = script || '(Pesquisa desativada — nenhum script necessário para esta página)';
+  var lines = [];
+  lines.push('<script>');
+  lines.push('(function(){');
+  lines.push('  var WEBHOOK    = "' + webhook + '";');
+  lines.push('  var WPP_LINK   = "' + wppLink + '";');
+  lines.push('  var ORIGEM     = "' + origem + '";');
+  lines.push('  var LANCAMENTO = "' + lancamento + '";');
+  lines.push('  var TIMER_SEC  = ' + timer + ';');
+  lines.push('  var perguntas  = ' + pJson + ';');
+  lines.push('');
+  lines.push('  /* Cole o restante do script de pesquisa aqui */');
+  lines.push('})();');
+  lines.push('<\/script>');
+
+  document.getElementById('ob-script-gerado').value = lines.join('\n');
 }
 
 function copiarScriptObrigado(){
