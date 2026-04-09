@@ -801,31 +801,50 @@ function addLinhaUTM(){
 function renderModalUTM(){
   const tbody=document.getElementById('utm-modal-tbody');
   if(!tbody) return;
+  if(!utmLinhasModal.length){
+    tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:1rem">Clique em "+ Linha" para adicionar links</td></tr>';
+    return;
+  }
+  // Só re-renderiza se número de linhas mudou
+  const rows=tbody.querySelectorAll('tr[data-idx]');
+  if(rows.length===utmLinhasModal.length){
+    // Atualiza só os previews sem perder foco
+    utmLinhasModal.forEach((l,i)=>{ updateUTMPreview(i); });
+    return;
+  }
   const dom=document.getElementById('utm-group-dom')?.value||PROJ.dominio;
-  if(!utmLinhasModal.length){ tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:1rem">Clique em "+ Linha" para adicionar links</td></tr>'; return; }
   tbody.innerHTML=utmLinhasModal.map((l,i)=>{
-    const params=[];
-    if(l.utm_source) params.push('utm_source='+encodeURIComponent(l.utm_source));
-    if(l.utm_medium) params.push('utm_medium='+encodeURIComponent(l.utm_medium));
-    if(l.utm_campaign) params.push('utm_campaign='+encodeURIComponent(l.utm_campaign));
-    const full='https://'+dom+(l.destino_slug||'')+(params.length?'?'+params.join('&'):'');
-    const short=dom+(l.slug_redirect||'/slug');
-    return '<tr>'
-      +'<td><input value="'+(l.nome||'')+'" oninput="utmLinhasModal['+i+'].nome=this.value;renderModalUTM()" placeholder="Bio Instagram"></td>'
-      +'<td><input value="'+(l.slug_redirect||'')+'" oninput="utmLinhasModal['+i+'].slug_redirect=this.value;renderModalUTM()" placeholder="/ig-bio" style="width:80px"></td>'
-      +'<td><input value="'+(l.destino_slug||'')+'" oninput="utmLinhasModal['+i+'].destino_slug=this.value;renderModalUTM()" placeholder="/reforma" style="width:80px"></td>'
-      +'<td><input value="'+(l.utm_source||'')+'" oninput="utmLinhasModal['+i+'].utm_source=this.value;renderModalUTM()" placeholder="instagram" style="width:80px"></td>'
-      +'<td><input value="'+(l.utm_medium||'')+'" oninput="utmLinhasModal['+i+'].utm_medium=this.value;renderModalUTM()" placeholder="bio" style="width:65px"></td>'
-      +'<td><input value="'+(l.utm_campaign||'')+'" oninput="utmLinhasModal['+i+'].utm_campaign=this.value;renderModalUTM()" placeholder="reforma-abr" style="width:90px"></td>'
-      +'<td>'
-      +'<div class="ulp">'+short+'</div>'
-      +'<div class="ua">↓ redireciona para</div>'
-      +'<div class="ulp" style="font-size:0.63rem;color:var(--text3)">'+full+'</div>'
-      +'<button class="btn-cl" onclick="cpUrl(this.dataset.u)" data-u="https://'+short+'">Copiar</button>'
-      +'</td>'
+    return '<tr data-idx="'+i+'">'
+      +'<td><input value="'+(l.nome||'')+'" onchange="utmLinhasModal['+i+'].nome=this.value" onblur="updateUTMPreview('+i+')" placeholder="Bio Instagram"></td>'
+      +'<td><input value="'+(l.slug_redirect||'')+'" onchange="utmLinhasModal['+i+'].slug_redirect=this.value" onblur="updateUTMPreview('+i+')" placeholder="/ig-bio" style="width:80px"></td>'
+      +'<td><input value="'+(l.destino_slug||'')+'" onchange="utmLinhasModal['+i+'].destino_slug=this.value" onblur="updateUTMPreview('+i+')" placeholder="/reforma" style="width:80px"></td>'
+      +'<td><input value="'+(l.utm_source||'')+'" onchange="utmLinhasModal['+i+'].utm_source=this.value" onblur="updateUTMPreview('+i+')" placeholder="instagram" style="width:80px"></td>'
+      +'<td><input value="'+(l.utm_medium||'')+'" onchange="utmLinhasModal['+i+'].utm_medium=this.value" onblur="updateUTMPreview('+i+')" placeholder="bio" style="width:65px"></td>'
+      +'<td><input value="'+(l.utm_campaign||'')+'" onchange="utmLinhasModal['+i+'].utm_campaign=this.value" onblur="updateUTMPreview('+i+')" placeholder="reforma-abr" style="width:90px"></td>'
+      +'<td id="utm-prev-'+i+'">'+(buildUTMPreview(l,document.getElementById('utm-group-dom')?.value||PROJ.dominio))+'</td>'
       +'<td><button class="btn-dr" onclick="utmLinhasModal.splice('+i+',1);renderModalUTM()">✕</button></td>'
       +'</tr>';
   }).join('');
+}
+
+function buildUTMPreview(l,dom){
+  const params=[];
+  if(l.utm_source) params.push('utm_source='+encodeURIComponent(l.utm_source));
+  if(l.utm_medium) params.push('utm_medium='+encodeURIComponent(l.utm_medium));
+  if(l.utm_campaign) params.push('utm_campaign='+encodeURIComponent(l.utm_campaign));
+  const full='https://'+dom+(l.destino_slug||'')+(params.length?'?'+params.join('&'):'');
+  const short=dom+(l.slug_redirect||'/slug');
+  return '<div class="ulp">'+short+'</div>'
+    +'<div class="ua">↓ redireciona para</div>'
+    +'<div class="ulp" style="font-size:0.63rem;color:var(--text3)">'+full+'</div>'
+    +'<button class="btn-cl" onclick="cpUrl(this.dataset.u)" data-u="https://'+short+'">Copiar</button>';
+}
+
+function updateUTMPreview(i){
+  const el=document.getElementById('utm-prev-'+i);
+  if(!el) return;
+  const dom=document.getElementById('utm-group-dom')?.value||PROJ.dominio;
+  el.innerHTML=buildUTMPreview(utmLinhasModal[i],dom);
 }
 
 async function salvarGrupoUTM(){
