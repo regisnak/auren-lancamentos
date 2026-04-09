@@ -11,44 +11,44 @@
 
   :root{
     --bg:#0b0e1a;
-    --surface:#111827;
-    --surface2:#1a2236;
-    --surface3:#1e2840;
+    --surface:#141e30;
+    --surface2:#1e2a40;
+    --surface3:#243248;
     --border:rgba(212,175,100,0.12);
     --border2:rgba(212,175,100,0.28);
     --text:#ffffff;
-    --text2:#b8cce4;
-    --text3:#7a9ab8;
-    --accent:#e8c050;
-    --accent2:#f5d878;
-    --green:#22c55e;
-    --red:#ef4444;
-    --blue:#7eaadc;
-    --amber:#e8a020;
+    --text2:#d0e4f8;
+    --text3:#a0bcd8;
+    --accent:#ffd04a;
+    --accent2:#ffe080;
+    --green:#4ade80;
+    --red:#f87171;
+    --blue:#93c5fd;
+    --amber:#fbbf24;
     --font:'Sora',sans-serif;
     --mono:'DM Mono',monospace;
   }
 
 
   [data-theme='light'] {
-    --bg:#f0f4f8;
+    --bg:#eef2f7;
     --surface:#ffffff;
-    --surface2:#e8eef5;
-    --surface3:#dde5ef;
-    --border:rgba(30,80,160,0.15);
-    --border2:rgba(30,80,160,0.3);
-    --text:#0d1b2e;
-    --text2:#2a4a6e;
-    --text3:#6a8aae;
-    --accent:#1a4fa0;
-    --accent2:#1e63cc;
-    --green:#16a34a;
-    --red:#dc2626;
-    --blue:#1e63cc;
-    --amber:#c27a00;
+    --surface2:#dce6f2;
+    --surface3:#cddaed;
+    --border:rgba(15,50,130,0.18);
+    --border2:rgba(15,50,130,0.35);
+    --text:#07112a;
+    --text2:#1a3a6e;
+    --text3:#4a6a9e;
+    --accent:#0f3280;
+    --accent2:#1a50cc;
+    --green:#15803d;
+    --red:#b91c1c;
+    --blue:#1d4ed8;
+    --amber:#b45309;
   }
 
-  body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;min-height:100vh}
 
   /* ── LOGIN ── */
   #login-screen{
@@ -84,22 +84,24 @@
   }
   .t-logo img{height:32px;width:auto;border-radius:6px}
   .t-name{font-size:0.9rem;font-weight:600;color:var(--accent2)}
-  .t-url{font-size:0.72rem;color:var(--text3)}
+  .t-url{font-size:0.78rem;color:var(--text3)}
   .t-right{display:flex;align-items:center;gap:10px}
   .status-dot{
     display:flex;align-items:center;gap:6px;
-    font-size:0.72rem;color:var(--text2);
+    font-size:0.78rem;color:var(--text2);
   }
   .dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
   .dot.off{background:var(--text3)}
   .btn-theme{
-    font-size:0.9rem;padding:4px 8px;border-radius:6px;
-    border:1px solid var(--border);background:transparent;
+    font-size:1rem;padding:5px 10px;border-radius:8px;
+    border:1px solid var(--border2);
+    background:rgba(255,208,74,0.12);
     color:var(--accent2);cursor:pointer;transition:all 0.15s;
+    font-weight:500;
   }
-  .btn-theme:hover{background:var(--surface2)}
+  .btn-theme:hover{background:rgba(255,208,74,0.25)}
   .btn-logout{
-    font-size:0.72rem;padding:5px 12px;border-radius:6px;
+    font-size:0.78rem;padding:5px 12px;border-radius:6px;
     border:1px solid var(--border);background:transparent;
     color:var(--text3);cursor:pointer;font-family:var(--font);
     transition:color 0.15s,border-color 0.15s;
@@ -112,7 +114,7 @@
     background:var(--surface);border-bottom:1px solid var(--border);
   }
   .tab{
-    font-size:0.78rem;font-weight:500;padding:12px 16px;
+    font-size:0.85rem;font-weight:500;padding:12px 16px;
     border-bottom:2px solid transparent;cursor:pointer;
     color:var(--text3);transition:all 0.15s;white-space:nowrap;
   }
@@ -129,7 +131,7 @@
     border-radius:12px;padding:1.25rem;
   }
   .panel-title{
-    font-size:0.72rem;font-weight:500;color:var(--accent);
+    font-size:0.78rem;font-weight:500;color:var(--accent);
     text-transform:uppercase;letter-spacing:0.1em;
     margin-bottom:1rem;display:flex;align-items:center;gap:8px;
   }
@@ -138,7 +140,7 @@
     background:var(--accent);border-radius:2px;
   }
   .section-label{
-    font-size:0.68rem;font-weight:500;color:var(--text3);
+    font-size:0.74rem;font-weight:500;color:var(--text3);
     text-transform:uppercase;letter-spacing:0.1em;
     margin:1.25rem 0 0.75rem;padding-bottom:6px;
     border-bottom:1px solid var(--border);
@@ -147,11 +149,11 @@
 
   /* ── FIELDS ── */
   .field{margin-bottom:12px}
-  .field-label{font-size:0.72rem;color:var(--text2);margin-bottom:5px;font-weight:500}
+  .field-label{font-size:0.78rem;color:var(--text2);margin-bottom:5px;font-weight:500}
   .field-input{
     width:100%;background:var(--surface2);border:1px solid var(--border);
     border-radius:8px;color:var(--text);font-family:var(--font);
-    font-size:0.83rem;padding:8px 11px;outline:none;
+    font-size:0.9rem;padding:8px 11px;outline:none;
     transition:border-color 0.2s;
   }
   .field-input:focus{border-color:var(--accent)}
@@ -166,13 +168,13 @@
     border-radius:10px;padding:1rem;margin-bottom:1.25rem;
   }
   .ai-label{
-    font-size:0.68rem;font-weight:600;color:var(--accent);
+    font-size:0.74rem;font-weight:600;color:var(--accent);
     text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;
     display:flex;align-items:center;gap:6px;
   }
   .ai-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
   .btn-ai{
-    font-size:0.72rem;padding:5px 12px;border-radius:6px;
+    font-size:0.78rem;padding:5px 12px;border-radius:6px;
     border:1px solid var(--border2);background:rgba(201,168,76,0.1);
     color:var(--accent);cursor:pointer;font-family:var(--font);
     transition:background 0.15s;
@@ -189,12 +191,12 @@
   .wa-preview{
     background:var(--surface2);border:1px solid var(--border);
     border-radius:8px;padding:8px 11px;margin-top:6px;
-    font-size:0.72rem;color:var(--text3);display:flex;
+    font-size:0.78rem;color:var(--text3);display:flex;
     align-items:center;justify-content:space-between;gap:8px;
   }
-  .wa-link{font-family:var(--mono);font-size:0.68rem;color:var(--blue);word-break:break-all}
+  .wa-link{font-family:var(--mono);font-size:0.74rem;color:var(--blue);word-break:break-all}
   .btn-test{
-    font-size:0.68rem;padding:3px 8px;border-radius:5px;
+    font-size:0.74rem;padding:3px 8px;border-radius:5px;
     border:1px solid rgba(126,170,220,0.3);background:transparent;
     color:var(--blue);cursor:pointer;font-family:var(--font);white-space:nowrap;
   }
@@ -234,8 +236,8 @@
   }
   .ver-item:hover{border-color:var(--border2)}
   .ver-item.active-ver{border-color:var(--accent)}
-  .ver-name{font-size:0.78rem;font-weight:500;color:var(--text)}
-  .ver-conv{font-size:0.68rem;color:var(--green)}
+  .ver-name{font-size:0.85rem;font-weight:500;color:var(--text)}
+  .ver-conv{font-size:0.74rem;color:var(--green)}
   .ver-badge{
     font-size:0.65rem;padding:2px 8px;border-radius:10px;
   }
@@ -249,7 +251,7 @@
     padding:12px 1.5rem;display:flex;
     align-items:center;justify-content:space-between;z-index:100;
   }
-  .footer-status{display:flex;align-items:center;gap:8px;font-size:0.75rem;color:var(--text2)}
+  .footer-status{display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text2)}
   .footer-btns{display:flex;gap:8px}
   .btn-ghost{
     font-size:0.82rem;padding:8px 16px;border-radius:8px;
@@ -294,14 +296,14 @@
     background:var(--surface2);border-radius:10px;
     padding:1rem;border:1px solid var(--border);
   }
-  .metric-label{font-size:0.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
+  .metric-label{font-size:0.74rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
   .metric-value{font-size:1.6rem;font-weight:600;color:var(--text)}
   .metric-sub{font-size:0.7rem;color:var(--text3);margin-top:2px}
   .metric-up{color:var(--green)}
   .metric-down{color:var(--red)}
   .table-wrap{overflow-x:auto}
   table{width:100%;border-collapse:collapse;font-size:0.78rem}
-  th{text-align:left;padding:8px 12px;font-size:0.68rem;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid var(--border)}
+  th{text-align:left;padding:8px 12px;font-size:0.74rem;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid var(--border)}
   td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text2)}
   tr:hover td{background:rgba(255,255,255,0.02)}
   .badge-green{background:rgba(34,197,94,0.12);color:var(--green);font-size:0.65rem;padding:2px 7px;border-radius:4px}
@@ -311,7 +313,7 @@
   /* ── FORM TAB ── */
   .checkbox-group{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
   .chip{
-    font-size:0.72rem;padding:5px 12px;border-radius:20px;
+    font-size:0.78rem;padding:5px 12px;border-radius:20px;
     border:1px solid var(--border);background:var(--surface2);
     color:var(--text2);cursor:pointer;transition:all 0.15s;user-select:none;
   }
@@ -326,8 +328,8 @@
   .upload-zone:hover{border-color:var(--accent)}
   .upload-zone input{display:none}
   .upload-icon{font-size:2rem;margin-bottom:8px}
-  .upload-label{font-size:0.83rem;color:var(--text2);margin-bottom:4px}
-  .upload-sub{font-size:0.72rem;color:var(--text3)}
+  .upload-label{font-size:0.9rem;color:var(--text2);margin-bottom:4px}
+  .upload-sub{font-size:0.78rem;color:var(--text3)}
   .img-preview{
     width:100%;max-height:200px;object-fit:cover;
     border-radius:8px;margin-top:1rem;display:none;
@@ -335,7 +337,7 @@
   .img-url-copy{
     background:var(--surface2);border:1px solid var(--border);
     border-radius:8px;padding:8px 11px;margin-top:8px;
-    font-family:var(--mono);font-size:0.72rem;color:var(--blue);
+    font-family:var(--mono);font-size:0.78rem;color:var(--blue);
     display:none;word-break:break-all;cursor:pointer;
   }
 
@@ -347,7 +349,7 @@
   .deploy-log{
     background:var(--surface2);border:1px solid var(--border);
     border-radius:8px;padding:10px 14px;margin-top:10px;
-    font-family:var(--mono);font-size:0.72rem;color:var(--text3);
+    font-family:var(--mono);font-size:0.78rem;color:var(--text3);
     max-height:120px;overflow-y:auto;display:none;
   }
   .deploy-log.visible{display:block}
@@ -385,7 +387,7 @@
         onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <div class="loading-bar" id="login-bar"></div>
-    <div id="login-error" style="font-size:0.75rem;color:var(--red);margin-bottom:10px;display:none"></div>
+    <div id="login-error" style="font-size:0.82rem;color:var(--red);margin-bottom:10px;display:none"></div>
     <button class="btn-save" style="width:100%;justify-content:center" onclick="doLogin()">
       Entrar
     </button>
@@ -410,7 +412,7 @@
         <div class="dot" id="site-dot"></div>
         <span id="site-status">verificando...</span>
       </div>
-      <span style="font-size:0.68rem;color:var(--text3)" id="last-deploy"></span>
+      <span style="font-size:0.74rem;color:var(--text3)" id="last-deploy"></span>
       <button class="btn-theme" id="btn-theme" onclick="toggleTheme()" title="Alternar tema">☀</button>
       <button class="btn-logout" onclick="doLogout()">Sair</button>
     </div>
@@ -700,7 +702,7 @@
         </div>
         <div class="field">
           <div class="field-label">Script gerado (somente leitura — atualiza ao salvar)</div>
-          <textarea class="field-input" id="script-gerado" style="min-height:140px;font-family:var(--mono);font-size:0.72rem;color:var(--text3)" readonly
+          <textarea class="field-input" id="script-gerado" style="min-height:140px;font-family:var(--mono);font-size:0.78rem;color:var(--text3)" readonly
             placeholder="O script será gerado aqui após preencher os campos acima..."></textarea>
         </div>
         <button class="btn-ai" onclick="gerarScript()" style="margin-top:4px">Visualizar script</button>
@@ -802,7 +804,7 @@
   <div class="tab-content" id="tab-dashboard">
     <div class="content">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
-        <div style="font-size:0.83rem;color:var(--text2)">Dados do Supabase NSD em tempo real</div>
+        <div style="font-size:0.9rem;color:var(--text2)">Dados do Supabase NSD em tempo real</div>
         <div style="display:flex;gap:8px">
           <select class="field-input" id="dash-periodo" style="width:auto" onchange="loadDashboard()">
             <option value="7">Últimos 7 dias</option>
@@ -882,7 +884,7 @@
   <div class="tab-content" id="tab-versoes">
     <div class="content">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
-        <div style="font-size:0.83rem;color:var(--text2)">Gerencie e compare as variações da página</div>
+        <div style="font-size:0.9rem;color:var(--text2)">Gerencie e compare as variações da página</div>
         <button class="btn-ghost" onclick="novaVersao()">+ Nova versão</button>
       </div>
       <div id="versoes-lista">
@@ -890,7 +892,7 @@
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
             <div>
               <div style="font-size:0.9rem;font-weight:600;color:var(--text)">Versão A — Urgência</div>
-              <div style="font-size:0.72rem;color:var(--text3);margin-top:2px">Criada em 01/04/2025 · ao vivo</div>
+              <div style="font-size:0.78rem;color:var(--text3);margin-top:2px">Criada em 01/04/2025 · ao vivo</div>
             </div>
             <div style="display:flex;gap:8px;align-items:center">
               <span class="ver-badge live">ao vivo</span>
@@ -1169,6 +1171,8 @@ async function loadConfig(){
 
     updatePreview();
     updateWaLink();
+    const siteField = document.getElementById('cfg-site-url');
+    if(siteField) siteField.value = CFG.SITE_URL;
     document.getElementById('last-deploy').textContent = 'config.js carregado';
   }catch(e){ console.warn('loadConfig:', e); }
 }
