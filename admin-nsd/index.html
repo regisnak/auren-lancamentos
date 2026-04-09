@@ -235,6 +235,7 @@ select.fi option{background:var(--surface2)}
       <button class="sb-tab active" onclick="showPanel('chat')" id="tab-chat">Chat</button>
       <button class="sb-tab" onclick="showPanel('cfg')" id="tab-cfg">Config</button>
       <button class="sb-tab" onclick="showPanel('utm')" id="tab-utm">UTMs</button>
+      <button class="sb-tab" onclick="showPanel('equipe')" id="tab-equipe">Equipe</button>
     </div>
   </div>
 
@@ -334,6 +335,34 @@ select.fi option{background:var(--surface2)}
       </div>
     </div>
 
+  <!-- EQUIPE -->
+    <div id="panel-equipe" style="display:none;height:100%;overflow:hidden;flex-direction:column">
+      <div class="ph">
+        <div><div class="ph-title">Equipe</div><div class="ph-sub">Usuários com acesso ao admin-nsd</div></div>
+        <button class="btn-s" onclick="openModalUser()">+ Novo usuário</button>
+      </div>
+      <div class="panel-inner on" style="display:block">
+        <div id="equipe-lista"><div style="text-align:center;color:var(--text3);font-size:0.75rem;padding:2rem 0">Carregando...</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL USUÁRIO -->
+<div id="modal-user" style="display:none">
+  <div class="modal-ov" onclick="if(event.target===this)closeModalUser()">
+    <div class="modal">
+      <div class="modal-t">👤 Novo usuário</div>
+      <div class="field"><div class="field-label">Nome</div><input class="fi" id="u-nome" placeholder="João Silva"></div>
+      <div class="field"><div class="field-label">E-mail</div><input class="fi" id="u-email" type="email" placeholder="joao@email.com"></div>
+      <div class="field"><div class="field-label">Senha temporária</div><input class="fi" id="u-senha" type="password" placeholder="mínimo 6 caracteres"></div>
+      <div style="font-size:0.72rem;color:var(--text3);margin-top:-6px;margin-bottom:10px">O usuário deverá alterar a senha no primeiro acesso.</div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn-g" onclick="closeModalUser()">Cancelar</button>
+        <button class="btn-s" onclick="criarUsuario()">Criar usuário</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -614,7 +643,8 @@ function showPanel(n){
   document.getElementById('panel-chat').style.display=n==='chat'?'flex':'none';
   document.getElementById('panel-cfg').style.display=n==='cfg'?'flex':'none';
   document.getElementById('panel-utm').style.display=n==='utm'?'flex':'none';
-  ['chat','cfg','utm'].forEach(t=>document.getElementById('tab-'+t)?.classList.toggle('active',t===n));
+  ['chat','cfg','utm','equipe'].forEach(t=>document.getElementById('tab-'+t)?.classList.toggle('active',t===n));
+  if(n==='equipe') loadEquipe();
 }
 
 let tipoSel='captura';
@@ -721,6 +751,76 @@ async function updUTM(i,campo,valor){
 async function delUTM(i){
   if(!confirm('Remover este link?')) return;
   try{ await sbNS.from('utm_links').delete().eq('id',utms[i].id); utms.splice(i,1); renderUTMs(); }catch(e){ toast('Erro: '+e.message,'error'); }
+}
+
+// ══════════════════════════════════════════
+// EQUIPE
+// ══════════════════════════════════════════
+async function loadEquipe(){
+  const el = document.getElementById('equipe-lista');
+  el.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:0.75rem;padding:2rem 0">Carregando...</div>';
+  try{
+    // Busca perfis que têm a permissão admin_nsd
+    const {data} = await sbAu.from('profiles').select('id,name,role_label,access').order('name');
+    const users = (data||[]).filter(p => (p.access||[]).includes(PROJ.perm));
+    if(!users.length){
+      el.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:0.75rem;padding:2rem 0">Nenhum usuário com acesso ao admin-nsd</div>';
+      return;
+    }
+    el.innerHTML = users.map(u => `
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:0.85rem;font-weight:500;color:var(--text)">${u.name||'—'}</div>
+          <div style="font-size:0.72rem;color:var(--text3);margin-top:2px">${u.role_label||'usuário'}</div>
+        </div>
+        <button class="btn-g" style="font-size:0.7rem;color:var(--red);border-color:rgba(248,113,113,0.3)" onclick="removerUsuario('${u.id}','${(u.name||'').replace(/'/g,"\'")}')">Remover acesso</button>
+      </div>`).join('');
+  }catch(e){ el.innerHTML = '<div style="color:var(--red);font-size:0.75rem;padding:1rem">Erro ao carregar equipe.</div>'; }
+}
+
+function openModalUser(){
+  document.getElementById('modal-user').style.display='block';
+  ['u-nome','u-email','u-senha'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+}
+function closeModalUser(){ document.getElementById('modal-user').style.display='none'; }
+
+async function criarUsuario(){
+  const nome  = document.getElementById('u-nome').value.trim();
+  const email = document.getElementById('u-email').value.trim();
+  const senha = document.getElementById('u-senha').value;
+  if(!nome||!email||!senha){ toast('Preencha todos os campos.','error'); return; }
+  if(senha.length < 6){ toast('Senha deve ter mínimo 6 caracteres.','error'); return; }
+  try{
+    // Precisa da service_role key do Auren para criar usuário via Admin API
+    // Por enquanto criamos via signUp e adicionamos permissão
+    const {data,error} = await sbAu.auth.admin.createUser({
+      email, password: senha,
+      user_metadata: { name: nome },
+      email_confirm: true
+    });
+    if(error) throw error;
+    // Adiciona permissão admin_nsd no perfil
+    const uid = data.user.id;
+    // Cria ou atualiza profile
+    const {data:prof} = await sbAu.from('profiles').select('access').eq('id',uid).single();
+    const access = [...(prof?.access||[])];
+    if(!access.includes(PROJ.perm)) access.push(PROJ.perm);
+    await sbAu.from('profiles').upsert({ id:uid, name:nome, access, role_label:'admin_nsd' });
+    closeModalUser();
+    toast('Usuário criado com acesso ao admin-nsd!','success');
+    loadEquipe();
+  }catch(e){ toast('Erro: '+e.message,'error'); }
+}
+
+async function removerUsuario(uid, nome){
+  if(!confirm('Remover acesso de '+nome+' ao admin-nsd?')) return;
+  try{
+    const {data} = await sbAu.from('profiles').select('access').eq('id',uid).single();
+    const access = (data?.access||[]).filter(p => p !== PROJ.perm);
+    await sbAu.from('profiles').update({access}).eq('id',uid);
+    toast('Acesso removido.','success');
+    loadEquipe();
+  }catch(e){ toast('Erro: '+e.message,'error'); }
 }
 
 function cpUrl(url){ navigator.clipboard.writeText('https://'+url).then(()=>toast('URL copiada!','success')); }
