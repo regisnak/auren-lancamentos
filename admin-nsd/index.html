@@ -3,1831 +3,738 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin NSD — Núcleo Superior de Direito</title>
+<title>Admin NSD — Criador de Sites</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0e1a;--surface:#141e30;--surface2:#1e2a40;--surface3:#243248;
+  --border:rgba(212,175,100,0.12);--border2:rgba(212,175,100,0.28);
+  --text:#ffffff;--text2:#d0e4f8;--text3:#a0bcd8;
+  --accent:#ffd04a;--accent2:#ffe080;
+  --green:#4ade80;--red:#f87171;--blue:#93c5fd;--amber:#fbbf24;
+  --font:'Sora',sans-serif;--mono:'DM Mono',monospace;
+  --sidebar:240px;--topbar:52px;
+}
+[data-theme='light']{
+  --bg:#eef2f7;--surface:#ffffff;--surface2:#dce6f2;--surface3:#cddaed;
+  --border:rgba(15,50,130,0.18);--border2:rgba(15,50,130,0.35);
+  --text:#07112a;--text2:#1a3a6e;--text3:#4a6a9e;
+  --accent:#0f3280;--accent2:#1a50cc;
+  --green:#15803d;--red:#b91c1c;--blue:#1d4ed8;--amber:#b45309;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;min-height:100vh}
 
-  *{box-sizing:border-box;margin:0;padding:0}
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2.5rem;width:100%;max-width:400px}
+.login-logo{margin-bottom:1.5rem}
+.login-logo img{height:48px;width:auto;border-radius:8px}
+.login-title{font-size:1.35rem;font-weight:600;color:var(--accent2);margin-bottom:4px}
+.login-sub{font-size:0.8rem;color:var(--text3);margin-bottom:2rem}
+.field{margin-bottom:12px}
+.field-label{font-size:0.78rem;color:var(--text2);margin-bottom:5px;font-weight:500}
+.fi{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font);font-size:0.88rem;padding:8px 11px;outline:none;transition:border-color 0.2s}
+.fi:focus{border-color:var(--accent)}
+.fi::placeholder{color:var(--text3)}
+textarea.fi{min-height:64px;resize:vertical}
+select.fi option{background:var(--surface2)}
 
-  :root{
-    --bg:#0b0e1a;
-    --surface:#141e30;
-    --surface2:#1e2a40;
-    --surface3:#243248;
-    --border:rgba(212,175,100,0.12);
-    --border2:rgba(212,175,100,0.28);
-    --text:#ffffff;
-    --text2:#d0e4f8;
-    --text3:#a0bcd8;
-    --accent:#ffd04a;
-    --accent2:#ffe080;
-    --green:#4ade80;
-    --red:#f87171;
-    --blue:#93c5fd;
-    --amber:#fbbf24;
-    --font:'Sora',sans-serif;
-    --mono:'DM Mono',monospace;
-  }
+#app{display:none;height:100vh;overflow:hidden}
 
+.topbar{height:var(--topbar);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1rem;position:fixed;top:0;left:0;right:0;z-index:200}
+.t-left{display:flex;align-items:center;gap:10px}
+.t-logo img{height:28px;border-radius:5px}
+.t-name{font-size:0.85rem;font-weight:600;color:var(--accent2)}
+.t-url{font-size:0.7rem;color:var(--text3)}
+.t-right{display:flex;align-items:center;gap:8px}
+.sdot{display:flex;align-items:center;gap:5px;font-size:0.7rem;color:var(--text2)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.dot.off{background:var(--text3)}
+.btn-theme{font-size:0.95rem;padding:4px 8px;border-radius:7px;border:1px solid var(--border2);background:rgba(255,208,74,0.1);color:var(--accent2);cursor:pointer;font-weight:500;transition:all 0.15s}
+.btn-theme:hover{background:rgba(255,208,74,0.22)}
+.btn-out{font-size:0.72rem;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;font-family:var(--font);transition:all 0.15s}
+.btn-out:hover{color:var(--text);border-color:var(--border2)}
 
-  [data-theme='light'] {
-    --bg:#eef2f7;
-    --surface:#ffffff;
-    --surface2:#dce6f2;
-    --surface3:#cddaed;
-    --border:rgba(15,50,130,0.18);
-    --border2:rgba(15,50,130,0.35);
-    --text:#07112a;
-    --text2:#1a3a6e;
-    --text3:#4a6a9e;
-    --accent:#0f3280;
-    --accent2:#1a50cc;
-    --green:#15803d;
-    --red:#b91c1c;
-    --blue:#1d4ed8;
-    --amber:#b45309;
-  }
+.sidebar{position:fixed;top:var(--topbar);left:0;bottom:0;width:var(--sidebar);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
+.sb-top{padding:10px;border-bottom:1px solid var(--border)}
+.btn-new{width:100%;padding:9px;border-radius:9px;border:none;background:linear-gradient(135deg,#c9a84c,#e8c87a);color:#0b0e1a;font-weight:600;font-size:0.82rem;cursor:pointer;font-family:var(--font);transition:opacity 0.15s}
+.btn-new:hover{opacity:0.9}
+.sb-search{margin-top:7px;position:relative}
+.sb-search input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--font);font-size:0.78rem;padding:5px 8px 5px 26px;outline:none}
+.sb-search input:focus{border-color:var(--accent)}
+.sb-search input::placeholder{color:var(--text3)}
+.si{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--text3)}
+.sb-filter{padding:6px 10px;border-bottom:1px solid var(--border)}
+.sb-filter select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-family:var(--font);font-size:0.75rem;padding:4px 7px;outline:none}
+.sb-list{flex:1;overflow-y:auto;padding:6px}
+.sb-list::-webkit-scrollbar{width:3px}
+.sb-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.s-cat{font-size:0.63rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;padding:8px 4px 3px}
+.s-item{padding:7px 9px;border-radius:7px;border:1px solid transparent;cursor:pointer;margin-bottom:2px;transition:all 0.15s}
+.s-item:hover{background:var(--surface2);border-color:var(--border)}
+.s-item.active{background:rgba(255,208,74,0.07);border-color:var(--accent)}
+.s-name{font-size:0.8rem;font-weight:500;color:var(--text);display:flex;align-items:center;gap:5px}
+.s-badge{font-size:0.58rem;padding:1px 5px;border-radius:4px;font-weight:500}
+.bc{background:rgba(147,197,253,0.15);color:var(--blue)}
+.bv{background:rgba(255,208,74,0.15);color:var(--accent)}
+.bo{background:rgba(74,222,128,0.15);color:var(--green)}
+.bk{background:rgba(251,191,36,0.15);color:var(--amber)}
+.s-url{font-size:0.67rem;color:var(--text3);margin-top:2px;display:flex;align-items:center;gap:3px;font-family:var(--mono)}
+.s-url span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:155px}
+.btn-cu{background:none;border:none;cursor:pointer;color:var(--text3);font-size:10px;padding:1px 3px;border-radius:3px;transition:color 0.15s}
+.btn-cu:hover{color:var(--accent)}
+.sp{font-size:0.6rem;padding:1px 5px;border-radius:4px;margin-top:2px;display:inline-block}
+.sp-pub{background:rgba(74,222,128,0.1);color:var(--green)}
+.sp-ras{background:rgba(160,188,216,0.1);color:var(--text3)}
+.sb-nav{padding:8px 10px;border-top:1px solid var(--border);display:flex;gap:4px}
+.sb-tab{flex:1;padding:6px 4px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;font-family:var(--font);font-size:0.67rem;text-align:center;transition:all 0.15s}
+.sb-tab.active{background:rgba(255,208,74,0.08);border-color:var(--accent);color:var(--accent2)}
 
-  body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;min-height:100vh}
+.main{margin-left:var(--sidebar);margin-top:var(--topbar);height:calc(100vh - var(--topbar));display:flex;flex-direction:column;overflow:hidden}
+.ph{padding:10px 1.25rem;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ph-title{font-size:0.88rem;font-weight:600;color:var(--text)}
+.ph-sub{font-size:0.7rem;color:var(--text3);margin-top:1px}
+.ph-actions{display:flex;gap:6px;align-items:center}
 
-  /* ── LOGIN ── */
-  #login-screen{
-    display:flex;align-items:center;justify-content:center;
-    min-height:100vh;padding:2rem;
-  }
-  .login-card{
-    background:var(--surface);border:1px solid var(--border);
-    border-radius:16px;padding:2.5rem;width:100%;max-width:400px;
-  }
-  .login-logo{
-    margin-bottom:1.5rem;
-    display:flex;align-items:center;
-  }
-  .login-logo img{height:48px;width:auto;border-radius:8px}
-  .login-title{font-size:1.35rem;font-weight:600;color:var(--accent2);margin-bottom:4px}
-  .login-sub{font-size:0.8rem;color:var(--text3);margin-bottom:2rem}
+.chat-area{flex:1;overflow-y:auto;padding:1.25rem;display:flex;flex-direction:column;gap:0.9rem}
+.chat-area::-webkit-scrollbar{width:4px}
+.chat-area::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:0.8rem;color:var(--text3)}
+.empty-icon{font-size:2.2rem;opacity:0.35}
+.empty-title{font-size:0.95rem;font-weight:500;color:var(--text2)}
+.empty-sub{font-size:0.75rem;text-align:center;max-width:300px;line-height:1.6}
+.suggestions{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:0.4rem}
+.sug{font-size:0.7rem;padding:5px 11px;border-radius:20px;border:1px solid var(--border2);background:rgba(255,208,74,0.05);color:var(--accent);cursor:pointer;transition:all 0.15s}
+.sug:hover{background:rgba(255,208,74,0.12)}
 
-  /* ── APP ── */
-  #app{display:none}
+.msg{display:flex;gap:9px;max-width:88%}
+.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:600;flex-shrink:0;margin-top:2px}
+.msg.ai .av{background:rgba(255,208,74,0.12);color:var(--accent2);border:1px solid var(--border2)}
+.msg.user .av{background:rgba(147,197,253,0.12);color:var(--blue);border:1px solid rgba(147,197,253,0.2)}
+.bubble{padding:9px 13px;border-radius:11px;font-size:0.83rem;line-height:1.6}
+.msg.ai .bubble{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:3px 11px 11px 11px}
+.msg.user .bubble{background:rgba(255,208,74,0.08);border:1px solid var(--border2);color:var(--text2);border-radius:11px 3px 11px 11px}
+.msg-btns{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap}
+.mb{font-size:0.7rem;padding:4px 10px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--accent);cursor:pointer;font-family:var(--font);transition:all 0.15s}
+.mb:hover{background:rgba(255,208,74,0.08)}
+.mb.p{background:linear-gradient(135deg,#c9a84c,#e8c87a);color:#0b0e1a;border:none;font-weight:600}
+.typing{display:flex;gap:4px;align-items:center;padding:9px 13px;background:var(--surface);border:1px solid var(--border);border-radius:3px 11px 11px 11px;width:fit-content}
+.typing span{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:tp 1.2s infinite}
+.typing span:nth-child(2){animation-delay:0.2s}
+.typing span:nth-child(3){animation-delay:0.4s}
+@keyframes tp{0%,60%,100%{opacity:0.3;transform:scale(0.8)}30%{opacity:1;transform:scale(1)}}
 
-  /* ── TOPBAR ── */
-  .topbar{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:0 1.5rem;height:56px;
-    background:var(--surface);border-bottom:1px solid var(--border);
-    position:sticky;top:0;z-index:100;
-  }
-  .topbar-left{display:flex;align-items:center;gap:12px}
-  .t-logo{
-    height:32px;width:auto;
-    display:flex;align-items:center;
-  }
-  .t-logo img{height:32px;width:auto;border-radius:6px}
-  .t-name{font-size:0.9rem;font-weight:600;color:var(--accent2)}
-  .t-url{font-size:0.78rem;color:var(--text3)}
-  .t-right{display:flex;align-items:center;gap:10px}
-  .status-dot{
-    display:flex;align-items:center;gap:6px;
-    font-size:0.78rem;color:var(--text2);
-  }
-  .dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
-  .dot.off{background:var(--text3)}
-  .btn-theme{
-    font-size:1rem;padding:5px 10px;border-radius:8px;
-    border:1px solid var(--border2);
-    background:rgba(255,208,74,0.12);
-    color:var(--accent2);cursor:pointer;transition:all 0.15s;
-    font-weight:500;
-  }
-  .btn-theme:hover{background:rgba(255,208,74,0.25)}
-  .btn-logout{
-    font-size:0.78rem;padding:5px 12px;border-radius:6px;
-    border:1px solid var(--border);background:transparent;
-    color:var(--text3);cursor:pointer;font-family:var(--font);
-    transition:color 0.15s,border-color 0.15s;
-  }
-  .btn-logout:hover{color:var(--text);border-color:var(--border2)}
+.chat-bottom{padding:0.85rem;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0}
+.tools-row{display:flex;gap:5px;margin-bottom:7px;flex-wrap:wrap}
+.tool{font-size:0.7rem;padding:3px 9px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;font-family:var(--font);transition:all 0.15s}
+.tool:hover{color:var(--text2);border-color:var(--border2)}
+.input-wrap{display:flex;gap:7px;align-items:flex-end;background:var(--surface2);border:1px solid var(--border);border-radius:11px;padding:7px 10px;transition:border-color 0.2s}
+.input-wrap:focus-within{border-color:var(--accent)}
+.chat-in{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--font);font-size:0.85rem;outline:none;resize:none;max-height:110px;line-height:1.5}
+.chat-in::placeholder{color:var(--text3)}
+.btn-send{width:30px;height:30px;border-radius:7px;border:none;background:linear-gradient(135deg,#c9a84c,#e8c87a);color:#0b0e1a;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:opacity 0.15s;flex-shrink:0}
+.btn-send:hover{opacity:0.85}
+.btn-send:disabled{opacity:0.3;cursor:not-allowed}
 
-  /* ── TABS ── */
-  .tabs{
-    display:flex;gap:2px;padding:0 1.5rem;
-    background:var(--surface);border-bottom:1px solid var(--border);
-  }
-  .tab{
-    font-size:0.85rem;font-weight:500;padding:12px 16px;
-    border-bottom:2px solid transparent;cursor:pointer;
-    color:var(--text3);transition:all 0.15s;white-space:nowrap;
-  }
-  .tab:hover{color:var(--text2)}
-  .tab.active{color:var(--accent2);border-bottom-color:var(--accent)}
+.panel-inner{height:100%;overflow-y:auto;padding:1.25rem;display:none;flex-direction:column}
+.panel-inner.on{display:flex}
+.panel-inner::-webkit-scrollbar{width:4px}
+.panel-inner::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.cfg-sec{margin-bottom:1.2rem}
+.cfg-t{font-size:0.67rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:9px;display:flex;align-items:center;gap:5px}
+.cfg-t::before{content:'';width:3px;height:9px;background:var(--accent);border-radius:2px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 
-  /* ── CONTENT ── */
-  .content{padding:1.5rem;max-width:1200px;margin:0 auto}
+.utm-wrap{overflow-x:auto;margin-top:0.8rem}
+.utm-t{width:100%;border-collapse:collapse;font-size:0.75rem;min-width:680px}
+.utm-t th{text-align:left;padding:7px 8px;font-size:0.65rem;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid var(--border)}
+.utm-t td{padding:5px 3px;border-bottom:1px solid rgba(255,255,255,0.03)}
+.utm-t td input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--font);font-size:0.75rem;padding:4px 7px;outline:none;width:100%;transition:border-color 0.15s}
+.utm-t td input:focus{border-color:var(--accent)}
+.ulp{font-family:var(--mono);font-size:0.67rem;color:var(--blue);word-break:break-all;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 7px;margin-top:3px}
+.ua{font-size:0.62rem;color:var(--text3);margin:2px 0}
+.btn-dr{background:none;border:none;cursor:pointer;color:var(--red);font-size:13px;padding:2px 5px;border-radius:4px;transition:background 0.15s}
+.btn-dr:hover{background:rgba(248,113,113,0.1)}
+.btn-cl{border:1px solid var(--border2);background:none;cursor:pointer;color:var(--accent);font-size:0.65rem;padding:2px 7px;border-radius:5px;font-family:var(--font);transition:all 0.15s;margin-top:2px}
+.btn-cl:hover{background:rgba(255,208,74,0.08)}
 
-  /* ── PANELS ── */
-  .panel-grid{display:grid;grid-template-columns:1fr 320px;gap:1.25rem;align-items:start}
-  .panel{
-    background:var(--surface);border:1px solid var(--border);
-    border-radius:12px;padding:1.25rem;
-  }
-  .panel-title{
-    font-size:0.78rem;font-weight:500;color:var(--accent);
-    text-transform:uppercase;letter-spacing:0.1em;
-    margin-bottom:1rem;display:flex;align-items:center;gap:8px;
-  }
-  .panel-title::before{
-    content:'';width:3px;height:12px;
-    background:var(--accent);border-radius:2px;
-  }
-  .section-label{
-    font-size:0.74rem;font-weight:500;color:var(--text3);
-    text-transform:uppercase;letter-spacing:0.1em;
-    margin:1.25rem 0 0.75rem;padding-bottom:6px;
-    border-bottom:1px solid var(--border);
-  }
-  .section-label:first-child{margin-top:0}
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:500;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:1.4rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.modal-t{font-size:0.95rem;font-weight:600;color:var(--accent2);margin-bottom:1.1rem}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:0.9rem}
+.tc{padding:9px 11px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;transition:all 0.15s;text-align:center}
+.tc:hover{border-color:var(--border2)}
+.tc.sel{border-color:var(--accent);background:rgba(255,208,74,0.07)}
+.tc-icon{font-size:1.1rem;margin-bottom:3px}
+.tc-name{font-size:0.75rem;font-weight:500;color:var(--text)}
+.tc-desc{font-size:0.62rem;color:var(--text3);margin-top:1px}
+.url-prev{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 11px;font-family:var(--mono);font-size:0.72rem;color:var(--text2);margin-top:5px;word-break:break-all}
+.url-prev em{color:var(--accent);font-style:normal}
 
-  /* ── FIELDS ── */
-  .field{margin-bottom:12px}
-  .field-label{font-size:0.78rem;color:var(--text2);margin-bottom:5px;font-weight:500}
-  .field-input{
-    width:100%;background:var(--surface2);border:1px solid var(--border);
-    border-radius:8px;color:var(--text);font-family:var(--font);
-    font-size:0.9rem;padding:8px 11px;outline:none;
-    transition:border-color 0.2s;
-  }
-  .field-input:focus{border-color:var(--accent)}
-  .field-input::placeholder{color:var(--text3)}
-  textarea.field-input{min-height:72px;resize:vertical}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.btn-s{font-size:0.8rem;padding:7px 18px;border-radius:8px;border:none;background:linear-gradient(135deg,#c9a84c,#e8c87a);color:#0b0e1a;font-weight:600;cursor:pointer;font-family:var(--font);transition:opacity 0.15s;display:inline-flex;align-items:center;gap:5px}
+.btn-s:hover{opacity:0.9}
+.btn-s:disabled{opacity:0.4;cursor:not-allowed}
+.btn-g{font-size:0.8rem;padding:7px 14px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all 0.15s}
+.btn-g:hover{color:var(--text);border-color:var(--accent)}
 
-  /* ── AI BOX ── */
-  .ai-box{
-    background:rgba(201,168,76,0.06);border:1px solid var(--border2);
-    border-radius:10px;padding:1rem;margin-bottom:1.25rem;
-  }
-  .ai-label{
-    font-size:0.74rem;font-weight:600;color:var(--accent);
-    text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;
-    display:flex;align-items:center;gap:6px;
-  }
-  .ai-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-  .btn-ai{
-    font-size:0.78rem;padding:5px 12px;border-radius:6px;
-    border:1px solid var(--border2);background:rgba(201,168,76,0.1);
-    color:var(--accent);cursor:pointer;font-family:var(--font);
-    transition:background 0.15s;
-  }
-  .btn-ai:hover{background:rgba(201,168,76,0.2)}
-  .btn-ai.primary{
-    background:linear-gradient(135deg,#c9a84c,#e8c87a);
-    color:#0b0e1a;border:none;font-weight:600;
-  }
-  .btn-ai.primary:hover{opacity:0.9}
-  .btn-ai:disabled{opacity:0.4;cursor:not-allowed}
+.lbar{height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent));background-size:200% 100%;animation:sh 1.2s infinite;border-radius:2px;margin:7px 0;display:none}
+.lbar.on{display:block}
+@keyframes sh{0%{background-position:-200% 0}100%{background-position:200% 0}}
 
-  /* ── WA PREVIEW ── */
-  .wa-preview{
-    background:var(--surface2);border:1px solid var(--border);
-    border-radius:8px;padding:8px 11px;margin-top:6px;
-    font-size:0.78rem;color:var(--text3);display:flex;
-    align-items:center;justify-content:space-between;gap:8px;
-  }
-  .wa-link{font-family:var(--mono);font-size:0.74rem;color:var(--blue);word-break:break-all}
-  .btn-test{
-    font-size:0.74rem;padding:3px 8px;border-radius:5px;
-    border:1px solid rgba(126,170,220,0.3);background:transparent;
-    color:var(--blue);cursor:pointer;font-family:var(--font);white-space:nowrap;
-  }
-
-  /* ── PREVIEW PHONE ── */
-  .preview-wrap{position:sticky;top:80px}
-  .preview-phone{
-    width:168px;margin:0 auto;
-    border:1px solid var(--border2);border-radius:14px;
-    overflow:hidden;background:#0b0e1a;
-  }
-  .ph-bar{height:8px;background:#1a2236;display:flex;align-items:center;justify-content:center}
-  .ph-dot{width:32px;height:3px;border-radius:2px;background:#2a3450}
-  .ph-hero{
-    height:52px;background:#111827;
-    display:flex;align-items:center;justify-content:center;
-    border-bottom:1px solid #1a2236;
-  }
-  .ph-hero-text{font-size:7px;color:#c9a84c;font-weight:500;text-align:center;padding:0 8px;line-height:1.5}
-  .ph-body{padding:8px}
-  .ph-tag{font-size:6px;background:#1a2236;color:#8a9ab8;padding:2px 6px;border-radius:3px;display:inline-block;margin-bottom:5px}
-  .ph-h1{font-size:7px;color:#f0ece4;font-weight:500;line-height:1.4;margin-bottom:3px}
-  .ph-sub{font-size:6px;color:#4a5a78;line-height:1.4;margin-bottom:6px}
-  .ph-price{background:#1a2236;border-radius:4px;padding:5px;margin-bottom:5px}
-  .ph-price-val{font-size:9px;color:#c9a84c;font-weight:500}
-  .ph-price-sub{font-size:6px;color:#8a9ab8}
-  .ph-btn{background:#c9a84c;border-radius:4px;padding:5px;text-align:center;font-size:7px;color:#0b0e1a;font-weight:600;margin-bottom:4px;cursor:pointer}
-  .ph-wa{border:1px solid rgba(34,197,94,0.4);border-radius:4px;padding:4px;text-align:center;font-size:6px;color:#22c55e}
-
-  /* ── VERSION CARDS ── */
-  .ver-list{margin-top:1rem}
-  .ver-item{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:8px 10px;border-radius:8px;border:1px solid var(--border);
-    margin-bottom:6px;background:var(--surface2);cursor:pointer;
-    transition:border-color 0.15s;
-  }
-  .ver-item:hover{border-color:var(--border2)}
-  .ver-item.active-ver{border-color:var(--accent)}
-  .ver-name{font-size:0.85rem;font-weight:500;color:var(--text)}
-  .ver-conv{font-size:0.74rem;color:var(--green)}
-  .ver-badge{
-    font-size:0.65rem;padding:2px 8px;border-radius:10px;
-  }
-  .live{background:rgba(34,197,94,0.15);color:var(--green)}
-  .teste{background:rgba(232,160,32,0.15);color:var(--amber)}
-
-  /* ── FOOTER ── */
-  .footer{
-    position:fixed;bottom:0;left:0;right:0;
-    background:var(--surface);border-top:1px solid var(--border);
-    padding:12px 1.5rem;display:flex;
-    align-items:center;justify-content:space-between;z-index:100;
-  }
-  .footer-status{display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text2)}
-  .footer-btns{display:flex;gap:8px}
-  .btn-ghost{
-    font-size:0.82rem;padding:8px 16px;border-radius:8px;
-    border:1px solid var(--border2);background:transparent;
-    color:var(--text2);cursor:pointer;font-family:var(--font);
-    transition:all 0.15s;
-  }
-  .btn-ghost:hover{color:var(--text);border-color:var(--accent)}
-  .btn-save{
-    font-size:0.82rem;padding:8px 20px;border-radius:8px;
-    border:none;background:linear-gradient(135deg,#c9a84c,#e8c87a);
-    color:#0b0e1a;font-weight:600;cursor:pointer;font-family:var(--font);
-    transition:opacity 0.15s;display:flex;align-items:center;gap:6px;
-  }
-  .btn-save:hover{opacity:0.9}
-  .btn-save:disabled{opacity:0.4;cursor:not-allowed}
-
-  /* ── LOADING BAR ── */
-  .loading-bar{
-    height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent));
-    background-size:200% 100%;animation:shimmer 1.2s infinite;
-    border-radius:2px;margin:8px 0;display:none;
-  }
-  .loading-bar.visible{display:block}
-  @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-
-  /* ── TOASTS ── */
-  #toast{
-    position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
-    background:var(--surface);border:1px solid var(--border2);
-    border-radius:8px;padding:10px 18px;font-size:0.8rem;
-    color:var(--text);z-index:999;display:none;
-    box-shadow:0 4px 24px rgba(0,0,0,0.4);
-  }
-  #toast.show{display:block}
-  #toast.success{border-color:rgba(34,197,94,0.4);color:var(--green)}
-  #toast.error{border-color:rgba(239,68,68,0.4);color:var(--red)}
-
-  /* ── DASHBOARD ── */
-  .metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.25rem}
-  .metric-card{
-    background:var(--surface2);border-radius:10px;
-    padding:1rem;border:1px solid var(--border);
-  }
-  .metric-label{font-size:0.74rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
-  .metric-value{font-size:1.6rem;font-weight:600;color:var(--text)}
-  .metric-sub{font-size:0.7rem;color:var(--text3);margin-top:2px}
-  .metric-up{color:var(--green)}
-  .metric-down{color:var(--red)}
-  .table-wrap{overflow-x:auto}
-  table{width:100%;border-collapse:collapse;font-size:0.78rem}
-  th{text-align:left;padding:8px 12px;font-size:0.74rem;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid var(--border)}
-  td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text2)}
-  tr:hover td{background:rgba(255,255,255,0.02)}
-  .badge-green{background:rgba(34,197,94,0.12);color:var(--green);font-size:0.65rem;padding:2px 7px;border-radius:4px}
-  .badge-amber{background:rgba(232,160,32,0.12);color:var(--amber);font-size:0.65rem;padding:2px 7px;border-radius:4px}
-  .badge-blue{background:rgba(126,170,220,0.12);color:var(--blue);font-size:0.65rem;padding:2px 7px;border-radius:4px}
-
-  /* ── FORM TAB ── */
-  .checkbox-group{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
-  .chip{
-    font-size:0.78rem;padding:5px 12px;border-radius:20px;
-    border:1px solid var(--border);background:var(--surface2);
-    color:var(--text2);cursor:pointer;transition:all 0.15s;user-select:none;
-  }
-  .chip.on{background:rgba(201,168,76,0.12);border-color:var(--accent);color:var(--accent2)}
-
-  /* ── IMAGE TAB ── */
-  .upload-zone{
-    border:2px dashed var(--border2);border-radius:12px;
-    padding:2rem;text-align:center;cursor:pointer;
-    transition:border-color 0.2s;
-  }
-  .upload-zone:hover{border-color:var(--accent)}
-  .upload-zone input{display:none}
-  .upload-icon{font-size:2rem;margin-bottom:8px}
-  .upload-label{font-size:0.9rem;color:var(--text2);margin-bottom:4px}
-  .upload-sub{font-size:0.78rem;color:var(--text3)}
-  .img-preview{
-    width:100%;max-height:200px;object-fit:cover;
-    border-radius:8px;margin-top:1rem;display:none;
-  }
-  .img-url-copy{
-    background:var(--surface2);border:1px solid var(--border);
-    border-radius:8px;padding:8px 11px;margin-top:8px;
-    font-family:var(--mono);font-size:0.78rem;color:var(--blue);
-    display:none;word-break:break-all;cursor:pointer;
-  }
-
-  /* PAGE SECTIONS */
-  .tab-content{display:none;padding-bottom:80px}
-  .tab-content.active{display:block}
-
-  /* DEPLOY LOG */
-  .deploy-log{
-    background:var(--surface2);border:1px solid var(--border);
-    border-radius:8px;padding:10px 14px;margin-top:10px;
-    font-family:var(--mono);font-size:0.78rem;color:var(--text3);
-    max-height:120px;overflow-y:auto;display:none;
-  }
-  .deploy-log.visible{display:block}
-  .log-line{margin-bottom:3px}
-  .log-ok{color:var(--green)}
-  .log-err{color:var(--red)}
-  .log-info{color:var(--blue)}
-
-  /* RESPONSIVE */
-  @media(max-width:768px){
-    .panel-grid{grid-template-columns:1fr}
-    .metrics-grid{grid-template-columns:repeat(2,1fr)}
-    .grid3{grid-template-columns:1fr 1fr}
-    .preview-wrap{display:none}
-  }
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:9px 16px;font-size:0.78rem;color:var(--text);z-index:999;display:none;box-shadow:0 4px 20px rgba(0,0,0,0.4)}
+#toast.show{display:block}
+#toast.success{border-color:rgba(74,222,128,0.4);color:var(--green)}
+#toast.error{border-color:rgba(248,113,113,0.4);color:var(--red)}
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════
-     LOGIN
-═══════════════════════════════════════════ -->
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo"><img src="logo.png" alt="NSD"></div>
     <div class="login-title">Admin NSD</div>
     <div class="login-sub">Acesse com sua conta Auren</div>
-    <div class="field">
-      <div class="field-label">E-mail</div>
-      <input class="field-input" type="email" id="login-email" placeholder="seu@email.com">
-    </div>
-    <div class="field">
-      <div class="field-label">Senha</div>
-      <input class="field-input" type="password" id="login-password" placeholder="••••••••"
-        onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <div class="loading-bar" id="login-bar"></div>
-    <div id="login-error" style="font-size:0.82rem;color:var(--red);margin-bottom:10px;display:none"></div>
-    <button class="btn-save" style="width:100%;justify-content:center" onclick="doLogin()">
-      Entrar
-    </button>
+    <div class="field"><div class="field-label">E-mail</div><input class="fi" type="email" id="le" placeholder="seu@email.com"></div>
+    <div class="field"><div class="field-label">Senha</div><input class="fi" type="password" id="lp" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="lbar" id="lb"></div>
+    <div id="lerr" style="font-size:0.75rem;color:var(--red);margin-bottom:10px;display:none"></div>
+    <button class="btn-s" style="width:100%;justify-content:center" onclick="doLogin()">Entrar</button>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     APP
-═══════════════════════════════════════════ -->
 <div id="app">
-  <!-- TOPBAR -->
   <div class="topbar">
-    <div class="topbar-left">
+    <div class="t-left">
       <div class="t-logo"><img src="logo.png" alt="NSD"></div>
-      <div>
-        <div class="t-name">Núcleo Superior de Direito</div>
-        <div class="t-url">foconareformatributaria.com.br</div>
-      </div>
+      <div><div class="t-name">Núcleo Superior de Direito</div><div class="t-url" id="t-url"></div></div>
     </div>
     <div class="t-right">
-      <div class="status-dot">
-        <div class="dot" id="site-dot"></div>
-        <span id="site-status">verificando...</span>
-      </div>
-      <span style="font-size:0.74rem;color:var(--text3)" id="last-deploy"></span>
-      <button class="btn-theme" id="btn-theme" onclick="toggleTheme()" title="Alternar tema">☀</button>
-      <button class="btn-logout" onclick="doLogout()">Sair</button>
+      <div class="sdot"><div class="dot" id="sdot"></div><span id="sstatus">verificando...</span></div>
+      <button class="btn-theme" id="btn-theme" onclick="toggleTheme()">☀</button>
+      <button class="btn-out" onclick="doLogout()">Sair</button>
     </div>
   </div>
 
-  <!-- TABS -->
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('editor')">Editor</div>
-    <div class="tab" onclick="switchTab('formulario')">Formulário</div>
-    <div class="tab" onclick="switchTab('imagens')">Imagens</div>
-    <div class="tab" onclick="switchTab('pixels')">Pixels & Scripts</div>
-    <div class="tab" onclick="switchTab('dashboard')">Dashboard</div>
-    <div class="tab" onclick="switchTab('versoes')">Teste A/B</div>
-    <div class="tab" onclick="switchTab('obrigado')">Pág. Obrigado</div>
-  </div>
-
-  <!-- ── TAB: EDITOR ── -->
-  <div class="tab-content active" id="tab-editor">
-    <div class="content">
-      <div class="panel-grid">
-        <div>
-          <!-- AI -->
-          <div class="ai-box">
-            <div class="ai-label">✦ Gerar com IA</div>
-            <textarea class="field-input" id="ai-brief" style="min-height:60px"
-              placeholder="Descreva o produto, público e o tom desejado... ex: Imersão ao vivo sobre Reforma Tributária para advogados que querem se destacar. Tom: urgência e autoridade."></textarea>
-            <div class="ai-btns">
-              <button class="btn-ai primary" onclick="gerarIA('tudo')">✦ Gerar tudo</button>
-              <button class="btn-ai" onclick="gerarIA('headline')">Headline</button>
-              <button class="btn-ai" onclick="gerarIA('subheadline')">Subheadline</button>
-              <button class="btn-ai" onclick="gerarIA('cta')">CTAs</button>
-              <button class="btn-ai" onclick="gerarIA('beneficios')">Benefícios</button>
-            </div>
-            <div class="loading-bar" id="ai-bar"></div>
-          </div>
-
-          <!-- EVENTO -->
-          <div class="panel">
-            <div class="panel-title">Evento</div>
-            <div class="grid2">
-              <div class="field">
-                <div class="field-label">Nome do evento</div>
-                <input class="field-input" id="evento-nome" placeholder="Imersão Certificação Reforma Tributária">
-              </div>
-              <div class="field">
-                <div class="field-label">Data (exibição)</div>
-                <input class="field-input" id="evento-data" placeholder="25 de abril de 2025">
-              </div>
-            </div>
-            <div class="grid3">
-              <div class="field">
-                <div class="field-label">Data ISO (countdown)</div>
-                <input class="field-input" id="evento-dataISO" type="datetime-local">
-              </div>
-              <div class="field">
-                <div class="field-label">Horário</div>
-                <input class="field-input" id="evento-horario" placeholder="19h (Brasília)">
-              </div>
-              <div class="field">
-                <div class="field-label">Formato</div>
-                <input class="field-input" id="evento-formato" placeholder="Online ao vivo">
-              </div>
-            </div>
-            <div class="field">
-              <div class="field-label">Duração</div>
-              <input class="field-input" id="evento-duracao" placeholder="3 dias">
-            </div>
-          </div>
-
-          <!-- COPY -->
-          <div class="panel" style="margin-top:1rem">
-            <div class="panel-title">Copy</div>
-            <div class="field">
-              <div class="field-label">Headline principal</div>
-              <textarea class="field-input" id="copy-headline" oninput="updatePreview()"
-                placeholder="Como Dominar a Reforma Tributária e se Tornar Referência no Mercado Jurídico em 3 Dias"></textarea>
-            </div>
-            <div class="field">
-              <div class="field-label">Subheadline</div>
-              <textarea class="field-input" id="copy-sub" oninput="updatePreview()"
-                placeholder="Imersão ao vivo com o Prof. Dr. Alessandro Spilborghs para advogados que querem sair na frente"></textarea>
-            </div>
-            <div class="grid2">
-              <div class="field">
-                <div class="field-label">CTA principal</div>
-                <input class="field-input" id="copy-cta" oninput="updatePreview()" placeholder="Garantir minha vaga agora">
-              </div>
-              <div class="field">
-                <div class="field-label">CTA bio/links</div>
-                <input class="field-input" id="copy-ctaBio" placeholder="Saiba mais sobre a Imersão">
-              </div>
-            </div>
-          </div>
-
-          <!-- PREÇO -->
-          <div class="panel" style="margin-top:1rem">
-            <div class="panel-title">Preço</div>
-            <div class="grid3">
-              <div class="field">
-                <div class="field-label">Valor cheio</div>
-                <input class="field-input" id="preco-valor" oninput="updatePreview()" placeholder="997">
-              </div>
-              <div class="field">
-                <div class="field-label">Nº parcelas</div>
-                <input class="field-input" id="preco-numParcelas" oninput="updatePreview()" placeholder="12">
-              </div>
-              <div class="field">
-                <div class="field-label">Valor parcela</div>
-                <input class="field-input" id="preco-parcela" oninput="updatePreview()" placeholder="97">
-              </div>
-            </div>
-            <div class="grid2">
-              <div class="field">
-                <div class="field-label">Valor à vista</div>
-                <input class="field-input" id="preco-avista" oninput="updatePreview()" placeholder="797">
-              </div>
-              <div class="field">
-                <div class="field-label">Texto do botão de preço</div>
-                <input class="field-input" id="preco-ctaTexto" placeholder="Quero garantir minha vaga">
-              </div>
-            </div>
-          </div>
-
-          <!-- LINKS -->
-          <div class="panel" style="margin-top:1rem">
-            <div class="panel-title">Links</div>
-            <div class="field">
-              <div class="field-label">Link de checkout</div>
-              <input class="field-input" id="link-checkout" placeholder="https://pay.hotmart.com/...">
-            </div>
-            <div class="section-label">WhatsApp</div>
-            <div class="grid2">
-              <div class="field">
-                <div class="field-label">Número (com DDI, sem símbolos)</div>
-                <input class="field-input" id="wa-numero" oninput="updateWaLink()" placeholder="5511999999999">
-              </div>
-              <div class="field">
-                <div class="field-label">Mensagem pré-preenchida</div>
-                <input class="field-input" id="wa-mensagem" oninput="updateWaLink()"
-                  placeholder="Olá! Tenho interesse na Imersão Reforma Tributária">
-              </div>
-            </div>
-            <div class="field">
-              <div class="field-label">CTA WhatsApp</div>
-              <input class="field-input" id="copy-ctaWa" placeholder="Falar com a equipe">
-            </div>
-            <div class="wa-preview" id="wa-preview" style="display:none">
-              <span class="wa-link" id="wa-link-text"></span>
-              <button class="btn-test" onclick="testarWa()">Testar</button>
-            </div>
-          </div>
-
-          <!-- VERSÃO -->
-          <div class="panel" style="margin-top:1rem">
-            <div class="panel-title">Versão A/B</div>
-            <div class="field">
-              <div class="field-label">Versão ativa desta configuração</div>
-              <select class="field-input" id="versao">
-                <option value="A">Versão A</option>
-                <option value="B">Versão B</option>
-                <option value="C">Versão C</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- PREVIEW -->
-        <div class="preview-wrap">
-          <div class="panel">
-            <div class="panel-title">Preview</div>
-            <div class="preview-phone">
-              <div class="ph-bar"><div class="ph-dot"></div></div>
-              <div class="ph-hero">
-                <div class="ph-hero-text" id="ph-event">IMERSÃO AO VIVO</div>
-              </div>
-              <div class="ph-body">
-                <div class="ph-tag" id="ph-tag">25 de abril · 19h</div>
-                <div class="ph-h1" id="ph-h1">Sua headline aparecerá aqui</div>
-                <div class="ph-sub" id="ph-sub">Subheadline da página de vendas</div>
-                <div class="ph-price">
-                  <div class="ph-price-val" id="ph-price">12x R$ 97</div>
-                  <div class="ph-price-sub" id="ph-avista">ou R$ 797 à vista</div>
-                </div>
-                <div class="ph-btn" id="ph-cta">Garantir minha vaga</div>
-                <div class="ph-wa" id="ph-wa">Falar com a equipe</div>
-              </div>
-            </div>
-
-            <div style="margin-top:1rem">
-              <div class="panel-title" style="margin-bottom:0.75rem">Versões</div>
-              <div class="ver-list" id="ver-list">
-                <div class="ver-item active-ver">
-                  <div>
-                    <div class="ver-name">Versão A</div>
-                    <div class="ver-conv">— sem dados ainda</div>
-                  </div>
-                  <span class="ver-badge live">ao vivo</span>
-                </div>
-              </div>
-              <button class="btn-ghost" style="width:100%;margin-top:8px;font-size:0.75rem"
-                onclick="switchTab('versoes')">
-                Gerenciar versões →
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+  <div class="sidebar">
+    <div class="sb-top">
+      <button class="btn-new" onclick="openModal()">+ Novo site</button>
+      <div class="sb-search"><span class="si">🔍</span><input type="text" placeholder="Buscar..." id="sb-search" oninput="filterSites()"></div>
+    </div>
+    <div class="sb-filter">
+      <select id="sb-tipo" onchange="filterSites()">
+        <option value="">Todos os tipos</option>
+        <option value="captura">Captura</option>
+        <option value="vendas">Vendas</option>
+        <option value="obrigado">Obrigado</option>
+        <option value="vsl">VSL</option>
+      </select>
+    </div>
+    <div class="sb-list" id="sb-list"><div style="text-align:center;color:var(--text3);font-size:0.75rem;padding:2rem 0">Carregando...</div></div>
+    <div class="sb-nav">
+      <button class="sb-tab active" onclick="showPanel('chat')" id="tab-chat">Chat</button>
+      <button class="sb-tab" onclick="showPanel('cfg')" id="tab-cfg">Config</button>
+      <button class="sb-tab" onclick="showPanel('utm')" id="tab-utm">UTMs</button>
     </div>
   </div>
 
-  <!-- ── TAB: FORMULÁRIO ── -->
-  <div class="tab-content" id="tab-formulario">
-    <div class="content">
-      <div class="panel" style="margin-bottom:1rem">
-        <div class="panel-title">Embed do formulário externo</div>
-        <div class="field">
-          <div class="field-label">Cole o HTML do formulário (Builderall, RD Station, ActiveCampaign...)</div>
-          <textarea class="field-input" id="form-embed" style="min-height:120px;font-family:var(--mono);font-size:0.75rem"
-            placeholder="<form action=&quot;https://...mailingboss...&quot; method=&quot;post&quot;>..."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Seletor do formulário (para o script de captura)</div>
-          <input class="field-input" id="form-selector" placeholder="form[action*=&quot;mailingboss&quot;]"
-            value="form[action*=&quot;mailingboss&quot;]">
-        </div>
-        <div class="field">
-          <div class="field-label">Posição na página</div>
-          <select class="field-input" id="form-posicao">
-            <option value="before-cta">Antes do CTA principal</option>
-            <option value="after-benefits">Após os benefícios</option>
-            <option value="popup">Pop-up com delay</option>
-            <option value="bottom">Final da página</option>
-          </select>
+  <div class="main">
+
+    <!-- CHAT -->
+    <div id="panel-chat" style="display:flex;flex-direction:column;height:100%">
+      <div class="ph">
+        <div><div class="ph-title" id="ph-nome">Selecione um site</div><div class="ph-sub" id="ph-url">ou crie um novo</div></div>
+        <div class="ph-actions">
+          <button class="btn-g" id="btn-prev" onclick="openPreview()" style="font-size:0.73rem;display:none">Abrir preview</button>
+          <button class="btn-s" id="btn-pub" onclick="publishSite()" style="display:none">✦ Publicar</button>
         </div>
       </div>
-
-      <div class="panel" style="margin-bottom:1rem">
-        <div class="panel-title">Campos do formulário</div>
-        <div class="field-label" style="margin-bottom:8px">Campos presentes no formulário</div>
-        <div class="checkbox-group" id="form-campos">
-          <div class="chip on" data-field="FNAME">Nome (FNAME)</div>
-          <div class="chip on" data-field="EMAIL">E-mail (EMAIL)</div>
-          <div class="chip on" data-field="PHONE">Telefone (PHONE)</div>
-          <div class="chip" data-field="LNAME">Sobrenome (LNAME)</div>
-          <div class="chip" data-field="WHATSAPP">WhatsApp</div>
-          <div class="chip" data-field="CPF">CPF</div>
-        </div>
-        <div class="section-label">IDs dos campos hidden de UTM</div>
-        <div class="grid3">
-          <div class="field">
-            <div class="field-label">UTM Source</div>
-            <input class="field-input" id="utm-source-id" value="UTM_SOURCE" placeholder="UTM_SOURCE">
-          </div>
-          <div class="field">
-            <div class="field-label">UTM Medium</div>
-            <input class="field-input" id="utm-medium-id" value="UTM_MEDIUM" placeholder="UTM_MEDIUM">
-          </div>
-          <div class="field">
-            <div class="field-label">UTM Campaign</div>
-            <input class="field-input" id="utm-campaign-id" value="UTM_CAMPAIGN" placeholder="UTM_CAMPAIGN">
-          </div>
-          <div class="field">
-            <div class="field-label">UTM Content</div>
-            <input class="field-input" id="utm-content-id" value="UTM_CONTENT" placeholder="UTM_CONTENT">
-          </div>
-          <div class="field">
-            <div class="field-label">UTM Term</div>
-            <input class="field-input" id="utm-term-id" value="UTM_TERM" placeholder="UTM_TERM">
+      <div class="chat-area" id="chat-area">
+        <div class="empty-state">
+          <div class="empty-icon">✦</div>
+          <div class="empty-title">Criador de Sites NSD</div>
+          <div class="empty-sub">Selecione um site na sidebar ou crie um novo para começar.</div>
+          <div class="suggestions">
+            <div class="sug" onclick="useSug(this)">Criar página de captura</div>
+            <div class="sug" onclick="useSug(this)">Criar página de vendas</div>
+            <div class="sug" onclick="useSug(this)">Criar página de obrigado com pesquisa</div>
+            <div class="sug" onclick="useSug(this)">Gerar headline urgente para advogados</div>
           </div>
         </div>
       </div>
-
-      <div class="panel" style="margin-bottom:1rem">
-        <div class="panel-title">Webhook de captura (N8N)</div>
-        <div class="field">
-          <div class="field-label">URL do webhook</div>
-          <input class="field-input" id="webhook-url" placeholder="https://n8n.seudominio.com/webhook/inscricao">
+      <div class="chat-bottom">
+        <div class="tools-row">
+          <button class="tool" onclick="ins('Muda a headline para: ')">Headline</button>
+          <button class="tool" onclick="ins('Altera o preço para: ')">Preço</button>
+          <button class="tool" onclick="ins('Muda o CTA para: ')">CTA</button>
+          <button class="tool" onclick="ins('Adiciona countdown para: ')">Countdown</button>
+          <button class="tool" onclick="ins('Muda a cor do botão para: ')">Cor</button>
+          <button class="tool" onclick="ins('Adiciona seção de benefícios com: ')">Benefícios</button>
         </div>
-        <div class="grid2">
-          <div class="field">
-            <div class="field-label">Origem</div>
-            <input class="field-input" id="webhook-origem" placeholder="organico" value="organico">
-          </div>
-          <div class="field">
-            <div class="field-label">Código do lançamento</div>
-            <input class="field-input" id="webhook-lancamento" placeholder="NSD_LC_01">
-          </div>
-        </div>
-        <div class="field">
-          <div class="field-label">Script gerado (somente leitura — atualiza ao salvar)</div>
-          <textarea class="field-input" id="script-gerado" style="min-height:140px;font-family:var(--mono);font-size:0.78rem;color:var(--text3)" readonly
-            placeholder="O script será gerado aqui após preencher os campos acima..."></textarea>
-        </div>
-        <button class="btn-ai" onclick="gerarScript()" style="margin-top:4px">Visualizar script</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── TAB: IMAGENS ── -->
-  <div class="tab-content" id="tab-imagens">
-    <div class="content">
-      <div class="panel-grid">
-        <div class="panel">
-          <div class="panel-title">Foto do expert</div>
-          <div class="upload-zone" onclick="document.getElementById('upload-expert').click()">
-            <input type="file" id="upload-expert" accept="image/*" onchange="handleUpload(this,'expert')">
-            <div class="upload-icon">👤</div>
-            <div class="upload-label">Clique para enviar a foto do expert</div>
-            <div class="upload-sub">JPG, PNG ou WEBP · máx 2MB</div>
-          </div>
-          <img class="img-preview" id="preview-expert">
-          <div class="img-url-copy" id="url-expert" onclick="copyUrl('expert')">
-            Clique para copiar a URL
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-title">Imagem de destaque (OG / hero)</div>
-          <div class="upload-zone" onclick="document.getElementById('upload-og').click()">
-            <input type="file" id="upload-og" accept="image/*" onchange="handleUpload(this,'og')">
-            <div class="upload-icon">🖼</div>
-            <div class="upload-label">Clique para enviar a imagem OG</div>
-            <div class="upload-sub">Recomendado: 1200×630px</div>
-          </div>
-          <img class="img-preview" id="preview-og">
-          <div class="img-url-copy" id="url-og" onclick="copyUrl('og')">
-            Clique para copiar a URL
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-title">Outras imagens</div>
-          <div class="upload-zone" onclick="document.getElementById('upload-extra').click()">
-            <input type="file" id="upload-extra" accept="image/*" onchange="handleUpload(this,'extra')">
-            <div class="upload-icon">+</div>
-            <div class="upload-label">Enviar imagem adicional</div>
-            <div class="upload-sub">Certificado, banner, logos...</div>
-          </div>
-          <img class="img-preview" id="preview-extra">
-          <div class="img-url-copy" id="url-extra" onclick="copyUrl('extra')">
-            Clique para copiar a URL
-          </div>
+        <div class="input-wrap">
+          <textarea class="chat-in" id="chat-in" placeholder="Digite uma instrução... ex: Muda a headline para algo mais urgente focado em advogados" rows="1"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"
+            oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"></textarea>
+          <button class="btn-send" id="btn-send" onclick="send()">→</button>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- ── TAB: PIXELS & SCRIPTS ── -->
-  <div class="tab-content" id="tab-pixels">
-    <div class="content">
-      <div class="panel" style="margin-bottom:1rem">
-        <div class="panel-title">Pixels de rastreamento</div>
-        <div class="grid2">
-          <div class="field">
-            <div class="field-label">Meta Pixel ID</div>
-            <input class="field-input" id="pixel-meta" placeholder="1234567890123456">
-          </div>
-          <div class="field">
-            <div class="field-label">Google Tag ID</div>
-            <input class="field-input" id="pixel-gtag" placeholder="G-XXXXXXXXXX">
-          </div>
-          <div class="field">
-            <div class="field-label">Google Tag Manager</div>
-            <input class="field-input" id="pixel-gtm" placeholder="GTM-XXXXXXX">
-          </div>
-          <div class="field">
-            <div class="field-label">Hotmart Pixel</div>
-            <input class="field-input" id="pixel-hotmart" placeholder="hotmart_pixel_id">
+    <!-- CONFIG -->
+    <div id="panel-cfg" style="display:none;height:100%;overflow:hidden;flex-direction:column">
+      <div class="ph"><div><div class="ph-title">Configurações do projeto</div><div class="ph-sub">Dados fixos usados em todos os sites</div></div><button class="btn-s" onclick="saveConfigs()">Salvar</button></div>
+      <div class="panel-inner on" style="display:block">
+        <div class="cfg-sec">
+          <div class="cfg-t">Domínio</div>
+          <div class="field"><div class="field-label">Domínio principal</div><input class="fi" id="cfg-dom" placeholder="foconareformatributaria.com.br"></div>
+          <button class="btn-g" onclick="window.open(PROJ.ep_url+'/projects/auren/services/'+PROJ.ep_svc+'/domains','_blank')" style="font-size:0.73rem;width:100%;margin-top:4px">Gerenciar domínios no Easypanel →</button>
+        </div>
+        <div class="cfg-sec">
+          <div class="cfg-t">Pixels</div>
+          <div class="g2">
+            <div class="field"><div class="field-label">Meta Pixel ID</div><input class="fi" id="cfg-meta" placeholder="1234567890"></div>
+            <div class="field"><div class="field-label">Google Tag ID</div><input class="fi" id="cfg-gtag" placeholder="G-XXXXXXXXXX"></div>
+            <div class="field"><div class="field-label">GTM</div><input class="fi" id="cfg-gtm" placeholder="GTM-XXXXXXX"></div>
+            <div class="field"><div class="field-label">Hotmart Pixel</div><input class="fi" id="cfg-hp" placeholder="hotmart_id"></div>
           </div>
         </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-title">Scripts personalizados</div>
-        <div class="field">
-          <div class="field-label">Script no &lt;head&gt; (antes do &lt;/head&gt;)</div>
-          <textarea class="field-input" id="script-head" style="min-height:100px;font-family:var(--mono);font-size:0.75rem"
-            placeholder="<!-- Scripts de rastreamento, fontes, etc. -->"></textarea>
+        <div class="cfg-sec">
+          <div class="cfg-t">Captura & Webhook</div>
+          <div class="field"><div class="field-label">URL do Workers (proxy Cloudflare)</div><input class="fi" id="cfg-workers" placeholder="https://webhook-proxy.seudominio.workers.dev/inscricao"></div>
+          <div class="g2">
+            <div class="field"><div class="field-label">Origem padrão</div><input class="fi" id="cfg-origem" placeholder="organico"></div>
+            <div class="field"><div class="field-label">Tag padrão do lançamento</div><input class="fi" id="cfg-tag" placeholder="NSD_LC_01"></div>
+          </div>
+          <div class="field"><div class="field-label">Seletor do formulário</div><input class="fi" id="cfg-sel" placeholder="form[action*=&quot;mailingboss&quot;]"></div>
         </div>
-        <div class="field">
-          <div class="field-label">Script no &lt;body&gt; (antes do &lt;/body&gt;)</div>
-          <textarea class="field-input" id="script-body" style="min-height:100px;font-family:var(--mono);font-size:0.75rem"
-            placeholder="<!-- Chat, popups, scripts de conversão, etc. -->"></textarea>
+        <div class="cfg-sec">
+          <div class="cfg-t">WhatsApp padrão</div>
+          <div class="g2">
+            <div class="field"><div class="field-label">Número (com DDI)</div><input class="fi" id="cfg-wa-n" placeholder="5519999999999"></div>
+            <div class="field"><div class="field-label">Mensagem padrão</div><input class="fi" id="cfg-wa-m" placeholder="Olá! Tenho interesse"></div>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── TAB: DASHBOARD ── -->
-  <div class="tab-content" id="tab-dashboard">
-    <div class="content">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
-        <div style="font-size:0.9rem;color:var(--text2)">Dados do Supabase NSD em tempo real</div>
-        <div style="display:flex;gap:8px">
-          <select class="field-input" id="dash-periodo" style="width:auto" onchange="loadDashboard()">
-            <option value="7">Últimos 7 dias</option>
-            <option value="30" selected>Últimos 30 dias</option>
-            <option value="90">Últimos 90 dias</option>
-          </select>
-          <button class="btn-ghost" onclick="loadDashboard()" style="font-size:0.75rem">↻ Atualizar</button>
-        </div>
-      </div>
-
-      <div class="metrics-grid" id="dash-metrics">
-        <div class="metric-card">
-          <div class="metric-label">Visitas</div>
-          <div class="metric-value" id="m-visitas">—</div>
-          <div class="metric-sub" id="m-visitas-sub">carregando...</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Cliques CTA</div>
-          <div class="metric-value" id="m-cliques">—</div>
-          <div class="metric-sub" id="m-cliques-sub">carregando...</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Conversões</div>
-          <div class="metric-value" id="m-conv">—</div>
-          <div class="metric-sub" id="m-conv-sub">carregando...</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Taxa de conversão</div>
-          <div class="metric-value" id="m-taxa">—%</div>
-          <div class="metric-sub" id="m-taxa-sub">cliques / visitas</div>
-        </div>
-      </div>
-
-      <div class="panel" style="margin-bottom:1rem">
-        <div class="panel-title">Origem do tráfego</div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>UTM Source</th>
-                <th>UTM Campaign</th>
-                <th>Visitas</th>
-                <th>Conversões</th>
-                <th>Taxa</th>
-              </tr>
-            </thead>
-            <tbody id="dash-utm-table">
-              <tr><td colspan="5" style="text-align:center;color:var(--text3)">carregando...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-title">Leads recentes</div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>E-mail</th>
-                <th>Origem</th>
-                <th>Data</th>
-                <th>Versão</th>
-              </tr>
-            </thead>
-            <tbody id="dash-leads-table">
-              <tr><td colspan="5" style="text-align:center;color:var(--text3)">carregando...</td></tr>
-            </tbody>
-          </table>
+        <div class="cfg-sec">
+          <div class="cfg-t">Scripts personalizados</div>
+          <div class="field"><div class="field-label">Script no &lt;head&gt;</div><textarea class="fi" id="cfg-sh" style="font-family:var(--mono);font-size:0.73rem" placeholder="<!-- Scripts de rastreamento... -->"></textarea></div>
+          <div class="field"><div class="field-label">Script no &lt;body&gt;</div><textarea class="fi" id="cfg-sb" style="font-family:var(--mono);font-size:0.73rem" placeholder="<!-- Chat, popups... -->"></textarea></div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- ── TAB: VERSÕES A/B ── -->
-  <div class="tab-content" id="tab-versoes">
-    <div class="content">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
-        <div style="font-size:0.9rem;color:var(--text2)">Gerencie e compare as variações da página</div>
-        <button class="btn-ghost" onclick="novaVersao()">+ Nova versão</button>
-      </div>
-      <div id="versoes-lista">
-        <div class="panel" style="margin-bottom:1rem">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
-            <div>
-              <div style="font-size:0.9rem;font-weight:600;color:var(--text)">Versão A — Urgência</div>
-              <div style="font-size:0.78rem;color:var(--text3);margin-top:2px">Criada em 01/04/2025 · ao vivo</div>
-            </div>
-            <div style="display:flex;gap:8px;align-items:center">
-              <span class="ver-badge live">ao vivo</span>
-              <button class="btn-ghost" style="font-size:0.72rem" onclick="editarVersao('A')">Editar</button>
-            </div>
-          </div>
-          <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr)">
-            <div class="metric-card">
-              <div class="metric-label">Visitas</div>
-              <div class="metric-value" style="font-size:1.2rem">—</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-label">Cliques</div>
-              <div class="metric-value" style="font-size:1.2rem">—</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-label">Conversões</div>
-              <div class="metric-value" style="font-size:1.2rem">—</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-label">Taxa</div>
-              <div class="metric-value metric-up" style="font-size:1.2rem">—%</div>
-            </div>
-          </div>
-        </div>
+    <!-- UTMs -->
+    <div id="panel-utm" style="display:none;height:100%;overflow:hidden;flex-direction:column">
+      <div class="ph"><div><div class="ph-title">Links & UTMs</div><div class="ph-sub">Gerador de links rastreáveis com redirect</div></div><button class="btn-s" onclick="addUTM()">+ Adicionar link</button></div>
+      <div class="panel-inner on" style="display:block">
+        <div class="field"><div class="field-label">Domínio base</div><input class="fi" id="utm-dom" placeholder="foconareformatributaria.com.br" oninput="renderUTMs()"></div>
+        <div class="utm-wrap"><table class="utm-t">
+          <thead><tr><th>Nome</th><th>Slug redirect</th><th>Destino</th><th>Source</th><th>Medium</th><th>Campaign</th><th>Link gerado</th><th></th></tr></thead>
+          <tbody id="utm-tbody"></tbody>
+        </table></div>
       </div>
     </div>
-  </div>
 
-
-  <!-- ── TAB: PÁGINA DE OBRIGADO ── -->
-  <div class="tab-content" id="tab-obrigado">
-    <div class="content">
-
-      <div class="panel" style="margin-bottom:1rem">
-        <div class="panel-title">Mensagem de confirmação</div>
-        <div class="field">
-          <div class="field-label">Título da página</div>
-          <input class="field-input" id="ob-titulo" placeholder="Sua inscrição foi confirmada! 🎉">
-        </div>
-        <div class="field">
-          <div class="field-label">Subtítulo / mensagem de boas-vindas</div>
-          <textarea class="field-input" id="ob-sub" placeholder="Olá! Sua vaga está garantida. Agora siga os próximos passos abaixo."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Vídeo embed (opcional — cole o iframe do YouTube/Vimeo)</div>
-          <textarea class="field-input" id="ob-video" style="font-family:var(--mono);font-size:0.78rem" placeholder='<iframe src="https://www.youtube.com/embed/..."  ...></iframe>'></textarea>
-        </div>
-      </div>
-
-      <div class="panel" style="margin-bottom:1rem">
-        <div class="panel-title">Botões de ação</div>
-        <div class="section-label">Grupo WhatsApp</div>
-        <div class="grid2">
-          <div class="field">
-            <div class="field-label">Texto do botão</div>
-            <input class="field-input" id="ob-wa-btn" placeholder="Entrar no grupo exclusivo">
-          </div>
-          <div class="field">
-            <div class="field-label">Link do grupo</div>
-            <input class="field-input" id="ob-wa-link" placeholder="https://chat.whatsapp.com/...">
-          </div>
-        </div>
-        <div class="section-label">Falar com a equipe</div>
-        <div class="grid2">
-          <div class="field">
-            <div class="field-label">Texto do botão</div>
-            <input class="field-input" id="ob-eq-btn" placeholder="Falar com a equipe">
-          </div>
-          <div class="field">
-            <div class="field-label">Link WhatsApp da equipe</div>
-            <input class="field-input" id="ob-eq-link" placeholder="https://wa.me/55119...">
-          </div>
-        </div>
-      </div>
-
-      <div class="panel" style="margin-bottom:1rem">
-        <div class="panel-title">Pesquisa pós-inscrição</div>
-        <div class="field">
-          <div class="field-label" style="display:flex;align-items:center;gap:8px">
-            <input type="checkbox" id="ob-pesquisa-ativa" onchange="togglePesquisa(this.checked)">
-            Ativar pesquisa nesta página
-          </div>
-        </div>
-        <div id="ob-pesquisa-campos" style="display:none">
-          <div class="grid2">
-            <div class="field">
-              <div class="field-label">URL do Workers (proxy Cloudflare)</div>
-              <input class="field-input" id="ob-webhook" placeholder="https://webhook-proxy.seudominio.workers.dev/pesquisa-nsd">
-            </div>
-            <div class="field">
-              <div class="field-label">Link após concluir pesquisa</div>
-              <input class="field-input" id="ob-wpp-link" placeholder="https://chat.whatsapp.com/...">
-            </div>
-          </div>
-          <div class="grid3">
-            <div class="field">
-              <div class="field-label">Origem</div>
-              <input class="field-input" id="ob-origem" placeholder="organico" value="organico">
-            </div>
-            <div class="field">
-              <div class="field-label">Timer redirect (segundos)</div>
-              <input class="field-input" id="ob-timer" type="number" value="7" min="1" max="30">
-            </div>
-            <div class="field">
-              <div class="field-label">Lançamento</div>
-              <input class="field-input" id="ob-lancamento" placeholder="NSD_LC_01">
-            </div>
-          </div>
-
-          <div class="section-label" style="margin-top:1rem">Perguntas da pesquisa</div>
-          <div id="ob-perguntas-lista"></div>
-          <button class="btn-ghost" onclick="adicionarPergunta()" style="margin-top:8px;font-size:0.78rem">+ Adicionar pergunta</button>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-title">Script gerado</div>
-        <div class="field">
-          <textarea class="field-input" id="ob-script-gerado" style="min-height:120px;font-family:var(--mono);font-size:0.74rem;color:var(--text3)" readonly placeholder="Configure os campos acima e clique em Gerar script..."></textarea>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:6px">
-          <button class="btn-ai" onclick="gerarScriptObrigado()">Gerar script</button>
-          <button class="btn-ai" onclick="copiarScriptObrigado()">Copiar</button>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- FOOTER -->
-  <div class="footer">
-    <div class="footer-status">
-      <div class="dot" id="footer-dot"></div>
-      <span id="footer-status-text">Pronto para publicar</span>
-    </div>
-    <div class="footer-btns">
-      <button class="btn-ghost" onclick="abrirPreview()">Abrir site</button>
-      <button class="btn-ghost" onclick="gerarScript()">Visualizar script</button>
-      <button class="btn-save" id="btn-salvar" onclick="salvarEPublicar()">
-        ✦ Salvar e publicar
-      </button>
-    </div>
-  </div>
-
-  <!-- DEPLOY LOG -->
-  <div style="position:fixed;bottom:70px;left:50%;transform:translateX(-50%);width:90%;max-width:500px;z-index:200">
-    <div class="deploy-log" id="deploy-log"></div>
   </div>
 </div>
 
-<!-- TOAST -->
+<!-- MODAL -->
+<div id="modal" style="display:none">
+  <div class="modal-ov" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-t">✦ Novo site</div>
+      <div class="field"><div class="field-label">Nome do site</div><input class="fi" id="m-nome" placeholder="ex: Imersão Reforma Tributária — Captura"></div>
+      <div class="field">
+        <div class="field-label">Tipo de página</div>
+        <div class="tgrid">
+          <div class="tc sel" data-tipo="captura" onclick="selTipo(this)"><div class="tc-icon">📋</div><div class="tc-name">Captura</div><div class="tc-desc">Formulário de leads</div></div>
+          <div class="tc" data-tipo="vendas" onclick="selTipo(this)"><div class="tc-icon">💰</div><div class="tc-name">Vendas</div><div class="tc-desc">Página de produto</div></div>
+          <div class="tc" data-tipo="obrigado" onclick="selTipo(this)"><div class="tc-icon">✅</div><div class="tc-name">Obrigado</div><div class="tc-desc">Pós-inscrição</div></div>
+          <div class="tc" data-tipo="vsl" onclick="selTipo(this)"><div class="tc-icon">▶</div><div class="tc-name">VSL</div><div class="tc-desc">Vídeo de vendas</div></div>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Slug da URL</div><input class="fi" id="m-slug" placeholder="reforma-tributaria" oninput="upPrev()"><div class="url-prev"><span id="pdom"></span>/<em id="pslug">slug</em></div></div>
+      <div class="field"><div class="field-label">Tag do lançamento</div><input class="fi" id="m-tag" placeholder="NSD_LC_01"></div>
+      <div class="field"><div class="field-label">Link de checkout (se aplicável)</div><input class="fi" id="m-co" placeholder="https://pay.hotmart.com/..."></div>
+      <div class="field"><div class="field-label">Link do grupo WhatsApp (se aplicável)</div><input class="fi" id="m-gwa" placeholder="https://chat.whatsapp.com/..."></div>
+      <div class="field"><div class="field-label">Webhook específico (opcional)</div><input class="fi" id="m-wh" placeholder="deixe vazio para usar o padrão"></div>
+      <div style="display:flex;gap:8px;margin-top:1rem;justify-content:flex-end">
+        <button class="btn-g" onclick="closeModal()">Cancelar</button>
+        <button class="btn-s" onclick="createSite()">Criar e começar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
-<!-- ═══════════════════════════════════════════
-     SCRIPTS
-═══════════════════════════════════════════ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// ══════════════════════════════════════════
-// CONFIG — substitua os placeholders
-// ══════════════════════════════════════════
-const CFG = {
-  // Supabase AUREN (auth + permissões)
-  AUREN_URL:      'https://wfqtxigxgthogrfcspfp.supabase.co',
-  AUREN_ANON:     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndmcXR4aWd4Z3Rob2dyZmNzcGZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTM3OTEsImV4cCI6MjA5MDgyOTc5MX0.gH1Rp8e2rmeOgT3H2DGmLu8RS5YKHfB8wo4wXZN0dPc',
-
-  // Supabase NSD (dados de rastreamento)
-  NSD_URL:        'https://hvggjnzwydomielffqlr.supabase.co',
-  NSD_ANON:       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2Z2dqbnp3eWRvbWllbGZmcWxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2MDc5MjIsImV4cCI6MjA5MTE4MzkyMn0.TO5IbVP3l_Ssk5DjYVeVmYW0hoCHjKUJf-YghQOoccc',
-  NSD_SERVICE:    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2Z2dqbnp3eWRvbWllbGZmcWxyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTYwNzkyMiwiZXhwIjoyMDkxMTgzOTIyfQ.QtAbJ-zIHcHsFPMAMW4yKhN0g7ufEimJnIm1-ds-fWM',
-
-  // GitHub
-  GITHUB_TOKEN:   null, // carregado do Supabase em runtime
-  GITHUB_REPO:    'regisnak/nsd',
-  GITHUB_BRANCH:  'main',
-  GITHUB_FILE:    'config.js',
-
-  // Easypanel
-
-  // Permissão necessária no Auren
-  PERMISSAO:      'admin_nsd',
-
-  // Site do NSD
-  SITE_URL:       'https://foconareformatributaria.com.br',
+const PROJ = {
+  id:'nsd', nome:'Núcleo Superior de Direito',
+  dominio:'foconareformatributaria.com.br',
+  perm:'admin_nsd',
+  gh_repo:'regisnak/nsd', gh_branch:'main', gh_file:'config.js',
+  ep_svc:'admin-nsd-app', ep_url:'http://82.29.59.7:3000'
 };
+const AU_URL  = 'https://wfqtxigxgthogrfcspfp.supabase.co';
+const AU_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndmcXR4aWd4Z3Rob2dyZmNzcGZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTM3OTEsImV4cCI6MjA5MDgyOTc5MX0.gH1Rp8e2rmeOgT3H2DGmLu8RS5YKHfB8wo4wXZN0dPc';
+const NS_URL  = 'https://hvggjnzwydomielffqlr.supabase.co';
+const NS_SVC  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2Z2dqbnp3eWRvbWllbGZmcWxyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTYwNzkyMiwiZXhwIjoyMDkxMTgzOTIyfQ.QtAbJ-zIHcHsFPMAMW4yKhN0g7ufEimJnIm1-ds-fWM';
+const sbAu = supabase.createClient(AU_URL, AU_ANON);
+const sbNS = supabase.createClient(NS_URL, NS_SVC);
 
-// ══════════════════════════════════════════
-// SUPABASE CLIENTS
-// ══════════════════════════════════════════
-const sbAuren = supabase.createClient(CFG.AUREN_URL, CFG.AUREN_ANON);
-const sbNSD   = supabase.createClient(CFG.NSD_URL,   CFG.NSD_SERVICE);
+let cur = null, sites = [], utms = [], ghToken = null, aiKey = null, aiModel = 'claude-sonnet-4-20250514';
+const acts = [];
 
-// ══════════════════════════════════════════
-// AUTH
-// ══════════════════════════════════════════
 function toggleTheme(){
-  const html = document.documentElement;
-  const isLight = html.getAttribute('data-theme') === 'light';
-  html.setAttribute('data-theme', isLight ? '' : 'light');
-  document.getElementById('btn-theme').textContent = isLight ? '☀' : '🌙';
-  localStorage.setItem('nsd-theme', isLight ? 'dark' : 'light');
+  const h = document.documentElement, isL = h.getAttribute('data-theme') === 'light';
+  h.setAttribute('data-theme', isL ? '' : 'light');
+  document.getElementById('btn-theme').textContent = isL ? '☀' : '🌙';
+  localStorage.setItem('nsd-t', isL ? 'dark' : 'light');
 }
-
-// Restore saved theme
-(function(){
-  const saved = localStorage.getItem('nsd-theme');
-  if(saved === 'light'){
-    document.documentElement.setAttribute('data-theme','light');
-    setTimeout(()=>{ const b=document.getElementById('btn-theme'); if(b) b.textContent='🌙'; },100);
-  }
-})();
+(function(){ const s=localStorage.getItem('nsd-t'); if(s==='light'){ document.documentElement.setAttribute('data-theme','light'); setTimeout(()=>{ const b=document.getElementById('btn-theme'); if(b) b.textContent='🌙'; },100); } })();
 
 async function doLogin(){
-  const email = document.getElementById('login-email').value.trim();
-  const pass  = document.getElementById('login-password').value;
-  const bar   = document.getElementById('login-bar');
-  const err   = document.getElementById('login-error');
-  if(!email||!pass){ showErr('Preencha e-mail e senha.'); return; }
-  bar.classList.add('visible');
-  err.style.display='none';
+  const e=document.getElementById('le').value.trim(), p=document.getElementById('lp').value;
+  const bar=document.getElementById('lb'), err=document.getElementById('lerr');
+  if(!e||!p){ showErr('Preencha e-mail e senha.'); return; }
+  bar.classList.add('on'); err.style.display='none';
   try{
-    const {data,error} = await sbAuren.auth.signInWithPassword({email,password:pass});
+    const {data,error} = await sbAu.auth.signInWithPassword({email:e,password:p});
     if(error) throw error;
-    const ok = await checkPermissao(data.user.id);
-    if(!ok){ await sbAuren.auth.signOut(); throw new Error('Sem permissão para acessar este painel.'); }
-    showApp();
-  }catch(e){
-    showErr(e.message);
-  }finally{
-    bar.classList.remove('visible');
-  }
+    const ok = await checkPerm(data.user.id);
+    if(!ok){ await sbAu.auth.signOut(); throw new Error('Sem permissão para acessar este painel.'); }
+    initApp();
+  }catch(ex){ showErr(ex.message); }
+  finally{ bar.classList.remove('on'); }
 }
-
-function showErr(msg){
-  const el = document.getElementById('login-error');
-  el.textContent = msg;
-  el.style.display = 'block';
-}
-
-async function checkPermissao(userId){
-  const {data} = await sbAuren.from('profiles').select('access').eq('id',userId).single();
+function showErr(m){ const el=document.getElementById('lerr'); el.textContent=m; el.style.display='block'; }
+async function checkPerm(uid){
+  const {data} = await sbAu.from('profiles').select('access').eq('id',uid).single();
   if(!data) return false;
-  const access = data.access || [];
-  return access.includes(CFG.PERMISSAO) || access.includes('owner');
+  const a = data.access||[];
+  return a.includes(PROJ.perm)||a.includes('owner');
 }
+async function doLogout(){ await sbAu.auth.signOut(); document.getElementById('app').style.display='none'; document.getElementById('login-screen').style.display='flex'; }
 
-async function doLogout(){
-  await sbAuren.auth.signOut();
-  document.getElementById('app').style.display='none';
-  document.getElementById('login-screen').style.display='flex';
-}
-
-async function showApp(){
+async function initApp(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='block';
-  await loadConfig();
-  await loadDashboard();
-  updatePreview();
-  checkSiteStatus();
+  document.getElementById('t-url').textContent = PROJ.dominio;
+  document.getElementById('pdom').textContent = PROJ.dominio;
+  document.getElementById('utm-dom').value = PROJ.dominio;
+  document.getElementById('cfg-dom').value = PROJ.dominio;
+  await loadCreds();
+  await loadSites();
+  await loadUTMs();
+  await loadCfg();
+  checkStatus();
 }
+(async()=>{ const {data:{session}} = await sbAu.auth.getSession(); if(session){ const ok=await checkPerm(session.user.id); if(ok){ initApp(); return; } } })();
 
-// Verifica sessão ao carregar
-(async()=>{
-  const {data:{session}} = await sbAuren.auth.getSession();
-  if(session){
-    const ok = await checkPermissao(session.user.id);
-    if(ok){ showApp(); return; }
-  }
-})();
-
-// ══════════════════════════════════════════
-// TABS
-// ══════════════════════════════════════════
-function switchTab(name){
-  document.querySelectorAll('.tab').forEach((t,i)=>{
-    const names=['editor','formulario','imagens','pixels','dashboard','versoes','obrigado'];
-    t.classList.toggle('active', names[i]===name);
-  });
-  document.querySelectorAll('.tab-content').forEach(c=>{
-    c.classList.toggle('active', c.id==='tab-'+name);
-  });
-  if(name==='dashboard') loadDashboard();
-}
-
-// ══════════════════════════════════════════
-// PREVIEW
-// ══════════════════════════════════════════
-function updatePreview(){
-  const h = document.getElementById('copy-headline')?.value || 'Sua headline aqui';
-  const s = document.getElementById('copy-sub')?.value || 'Subheadline da página';
-  const c = document.getElementById('copy-cta')?.value || 'Garantir minha vaga';
-  const p = document.getElementById('preco-numParcelas')?.value || '12';
-  const pv= document.getElementById('preco-parcela')?.value || '97';
-  const av= document.getElementById('preco-avista')?.value || '797';
-  const wa= document.getElementById('copy-ctaWa')?.value || 'Falar com a equipe';
-  const ev= document.getElementById('evento-nome')?.value || 'IMERSÃO AO VIVO';
-  const dt= document.getElementById('evento-data')?.value || '';
-  const hr= document.getElementById('evento-horario')?.value || '';
-
-  const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
-  set('ph-event', ev.toUpperCase().substring(0,20));
-  set('ph-tag', (dt?dt+' · ':'')+hr);
-  set('ph-h1', h.substring(0,80));
-  set('ph-sub', s.substring(0,100));
-  set('ph-price', p+'x R$ '+pv);
-  set('ph-avista', 'ou R$ '+av+' à vista');
-  set('ph-cta', c);
-  set('ph-wa', wa);
-}
-
-function updateWaLink(){
-  const num = document.getElementById('wa-numero').value.replace(/\D/g,'');
-  const msg = document.getElementById('wa-mensagem').value;
-  const prev = document.getElementById('wa-preview');
-  const link = document.getElementById('wa-link-text');
-  if(num){
-    const url = 'https://wa.me/'+num+(msg?'?text='+encodeURIComponent(msg):'');
-    link.textContent = url;
-    prev.style.display='flex';
-  } else {
-    prev.style.display='none';
-  }
-}
-
-function testarWa(){
-  const num = document.getElementById('wa-numero').value.replace(/\D/g,'');
-  const msg = document.getElementById('wa-mensagem').value;
-  if(num) window.open('https://wa.me/'+num+(msg?'?text='+encodeURIComponent(msg):''), '_blank');
-}
-
-// ══════════════════════════════════════════
-// LOAD / SAVE CONFIG
-// ══════════════════════════════════════════
-async function loadConfig(){
+async function loadCreds(){
   try{
-    // Busca token primeiro
-    const {data:sec} = await sbAuren.from('admin_secrets').select('github_token').eq('project','nsd').single();
-    const token = sec?.github_token;
-    if(!token){ console.warn('loadConfig: token não encontrado'); return; }
-
-    // Usa API do GitHub (funciona com repos privados)
-    const apiUrl = 'https://api.github.com/repos/'+CFG.GITHUB_REPO+'/contents/'+CFG.GITHUB_FILE+'?ref='+CFG.GITHUB_BRANCH;
-    const res = await fetch(apiUrl, {
-      headers:{ Authorization:'Bearer '+token, Accept:'application/vnd.github+json' }
-    });
-    if(!res.ok) return;
-    const json = await res.json();
-    // Conteúdo vem em base64
-    const txt = decodeURIComponent(escape(atob(json.content.split('\n').join(''))));
-    const match = txt.match(/const CONFIG\s*=\s*(\{[\s\S]*?\});/);
-    if(!match) return;
-    let cfg;
-    try{ cfg = eval('('+match[1]+')'); }catch(e){ return; }
-
-    const set=(id,v)=>{ const el=document.getElementById(id); if(el&&v!==undefined) el.value=v; };
-    set('evento-nome',     cfg.evento?.nome);
-    set('evento-data',     cfg.evento?.data);
-    set('evento-dataISO',  cfg.evento?.dataISO);
-    set('evento-horario',  cfg.evento?.horario);
-    set('evento-formato',  cfg.evento?.formato);
-    set('evento-duracao',  cfg.evento?.duracao);
-    set('copy-headline',   cfg.copy?.headline);
-    set('copy-sub',        cfg.copy?.subheadline);
-    set('copy-cta',        cfg.copy?.ctaPrincipal);
-    set('copy-ctaBio',     cfg.copy?.ctaBio);
-    set('copy-ctaWa',      cfg.copy?.ctaWhatsapp);
-    set('preco-valor',     cfg.preco?.valor);
-    set('preco-parcela',   cfg.preco?.parcela);
-    set('preco-numParcelas',cfg.preco?.numParcelas);
-    set('preco-avista',    cfg.preco?.avista);
-    set('preco-ctaTexto',  cfg.preco?.ctaTexto);
-    set('link-checkout',   cfg.links?.checkout);
-    set('pixel-meta',      cfg.pixels?.metaPixelID);
-    set('pixel-gtag',      cfg.pixels?.googleTagID);
-    set('pixel-hotmart',   cfg.pixels?.hotmartPixel);
-    if(cfg.versao){ document.getElementById('versao').value = cfg.versao; }
-
-    // WhatsApp — decompõe wa.me link
-    if(cfg.links?.whatsapp){
-      const waUrl = cfg.links.whatsapp;
-      const numMatch = waUrl.match(/wa\.me\/(\d+)/);
-      const msgMatch = waUrl.match(/\?text=(.+)/);
-      if(numMatch) document.getElementById('wa-numero').value = numMatch[1];
-      if(msgMatch) document.getElementById('wa-mensagem').value = decodeURIComponent(msgMatch[1]);
-    }
-
-    updatePreview();
-    updateWaLink();
-    const siteField = document.getElementById('cfg-site-url');
-    if(siteField) siteField.value = CFG.SITE_URL;
-    document.getElementById('last-deploy').textContent = 'config.js carregado';
-  }catch(e){ console.warn('loadConfig:', e); }
-}
-
-function buildConfig(){
-  const g = id => document.getElementById(id)?.value?.trim() || '';
-  const num = g('wa-numero').replace(/\D/g,'');
-  const msg = g('wa-mensagem');
-  const waLink = num ? 'https://wa.me/'+num+(msg?'?text='+encodeURIComponent(msg):'') : '';
-
-  return `const CONFIG = {
-  evento: {
-    nome:     "${g('evento-nome')}",
-    data:     "${g('evento-data')}",
-    dataISO:  "${g('evento-dataISO')}",
-    horario:  "${g('evento-horario')}",
-    formato:  "${g('evento-formato')}",
-    duracao:  "${g('evento-duracao')}"
-  },
-  copy: {
-    headline:     "${g('copy-headline').replace(/"/g,'\\"')}",
-    subheadline:  "${g('copy-sub').replace(/"/g,'\\"')}",
-    ctaPrincipal: "${g('copy-cta').replace(/"/g,'\\"')}",
-    ctaBio:       "${g('copy-ctaBio').replace(/"/g,'\\"')}",
-    ctaWhatsapp:  "${g('copy-ctaWa').replace(/"/g,'\\"')}"
-  },
-  preco: {
-    valor:       "${g('preco-valor')}",
-    parcela:     "${g('preco-parcela')}",
-    numParcelas: "${g('preco-numParcelas')}",
-    avista:      "${g('preco-avista')}",
-    ctaTexto:    "${g('preco-ctaTexto').replace(/"/g,'\\"')}"
-  },
-  links: {
-    checkout:  "${g('link-checkout')}",
-    whatsapp:  "${waLink}"
-  },
-  pixels: {
-    metaPixelID:  "${g('pixel-meta')}",
-    googleTagID:  "${g('pixel-gtag')}",
-    googleTagManager: "${g('pixel-gtm')}",
-    hotmartPixel: "${g('pixel-hotmart')}"
-  },
-  scripts: {
-    head: \`${document.getElementById('script-head')?.value || ''}\`,
-    body: \`${document.getElementById('script-body')?.value || ''}\`
-  },
-  formulario: {
-    embed:      \`${document.getElementById('form-embed')?.value || ''}\`,
-    selector:   "${document.getElementById('form-selector')?.value || 'form[action*=\\"mailingboss\\"]'}",
-    posicao:    "${document.getElementById('form-posicao')?.value || 'before-cta'}",
-    webhook:    "${g('webhook-url')}",
-    origem:     "${g('webhook-origem')}",
-    lancamento: "${g('webhook-lancamento')}",
-    campos: {
-      nome:     "${g('utm-source-id') ? 'FNAME' : ''}",
-      email:    "EMAIL",
-      fone:     "PHONE",
-      utmSource:    "${g('utm-source-id')}",
-      utmMedium:    "${g('utm-medium-id')}",
-      utmCampaign:  "${g('utm-campaign-id')}",
-      utmContent:   "${g('utm-content-id')}",
-      utmTerm:      "${g('utm-term-id')}"
-    }
-  },
-  supabase: {
-    url:     "${CFG.NSD_URL}",
-    anonKey: "${CFG.NSD_ANON}"
-  },
-  versao: "${document.getElementById('versao')?.value || 'A'}"
-};`;
-}
-
-// ══════════════════════════════════════════
-// SALVAR E PUBLICAR
-// ══════════════════════════════════════════
-async function salvarEPublicar(){
-  const btn = document.getElementById('btn-salvar');
-  const log = document.getElementById('deploy-log');
-  btn.disabled = true;
-  log.innerHTML = '';
-  log.classList.add('visible');
-
-  function addLog(msg, tipo='info'){
-    const cl = tipo==='ok'?'log-ok':tipo==='err'?'log-err':'log-info';
-    log.innerHTML += `<div class="log-line ${cl}">${msg}</div>`;
-    log.scrollTop = log.scrollHeight;
-  }
-
-  try{
-    addLog('→ Buscando token de acesso...');
-    const {data:sec} = await sbAuren.from('admin_secrets').select('github_token').eq('project','nsd').single();
-    if(!sec?.github_token) throw new Error('Token não encontrado. Verifique a tabela admin_secrets.');
-    CFG.GITHUB_TOKEN = sec.github_token;
-    addLog('→ Gerando config.js...');
-    const content = buildConfig();
-
-    addLog('→ Buscando SHA do arquivo no GitHub...');
-    const shaRes = await fetch(
-      `https://api.github.com/repos/${CFG.GITHUB_REPO}/contents/${CFG.GITHUB_FILE}?ref=${CFG.GITHUB_BRANCH}`,
-      { headers:{ Authorization:'Bearer '+CFG.GITHUB_TOKEN, Accept:'application/vnd.github+json' } }
-    );
-    const shaData = await shaRes.json();
-    if(!shaRes.ok) throw new Error('GitHub: '+shaData.message);
-    const sha = shaData.sha;
-
-    addLog('→ Fazendo commit no GitHub...');
-    const commitRes = await fetch(
-      `https://api.github.com/repos/${CFG.GITHUB_REPO}/contents/${CFG.GITHUB_FILE}`,
-      {
-        method:'PUT',
-        headers:{ Authorization:'Bearer '+CFG.GITHUB_TOKEN, Accept:'application/vnd.github+json', 'Content-Type':'application/json' },
-        body: JSON.stringify({
-          message: 'admin-nsd: atualiza config.js',
-          content: btoa(unescape(encodeURIComponent(content))),
-          sha,
-          branch: CFG.GITHUB_BRANCH
-        })
-      }
-    );
-    if(!commitRes.ok){
-      const e = await commitRes.json();
-      throw new Error('GitHub commit: '+e.message);
-    }
-    addLog('✓ config.js atualizado no GitHub', 'ok');
-    addLog('✓ Easypanel detectará o commit e redeploya automaticamente', 'ok');
-    addLog('✓ Site será atualizado em ~30 segundos', 'ok');
-
-    toast('Publicado com sucesso!', 'success');
-    document.getElementById('footer-status-text').textContent = 'Publicado · '+new Date().toLocaleTimeString('pt-BR');
-
-    setTimeout(()=>{
-      log.classList.remove('visible');
-    }, 8000);
-
-  }catch(e){
-    addLog('✗ Erro: '+e.message, 'err');
-    toast('Erro ao publicar: '+e.message, 'error');
-  }finally{
-    btn.disabled = false;
-  }
-}
-
-// ══════════════════════════════════════════
-// GERAR SCRIPT DE INSCRIÇÃO
-// ══════════════════════════════════════════
-function gerarScript(){
-  const g = id => document.getElementById(id)?.value?.trim() || '';
-  const webhook    = g('webhook-url');
-  const origem     = g('webhook-origem') || 'organico';
-  const lancamento = g('webhook-lancamento') || 'NSD_LC_01';
-  const selector   = g('form-selector') || 'form[action*="mailingboss"]';
-  const utmS  = g('utm-source-id')   || 'UTM_SOURCE';
-  const utmM  = g('utm-medium-id')   || 'UTM_MEDIUM';
-  const utmC  = g('utm-campaign-id') || 'UTM_CAMPAIGN';
-  const utmCt = g('utm-content-id')  || 'UTM_CONTENT';
-  const utmT  = g('utm-term-id')     || 'UTM_TERM';
-
-  const script = `<script>
-(function(){
-  var WEBHOOK    = '${webhook}';
-  var ORIGEM     = '${origem}';
-  var LANCAMENTO = '${lancamento}';
-
-  var params = new URLSearchParams(window.location.search);
-  var utmMap = {
-    '${utmS}':  'utm_source',
-    '${utmM}':  'utm_medium',
-    '${utmC}':  'utm_campaign',
-    '${utmCt}': 'utm_content',
-    '${utmT}':  'utm_term'
-  };
-  Object.keys(utmMap).forEach(function(fieldId){
-    var val = params.get(utmMap[fieldId]);
-    var el  = document.getElementById(fieldId);
-    if(el && val) el.value = val;
-  });
-
-  var form = document.querySelector('${selector}');
-  if(form){
-    form.addEventListener('submit', function(){
-      var data = {
-        nome:         document.getElementById('FNAME')?.value.trim()         || '',
-        email:        document.getElementById('EMAIL')?.value.trim()         || '',
-        fone:         document.getElementById('PHONE')?.value.trim()         || '',
-        utm_source:   document.getElementById('${utmS}')?.value.trim()  || params.get('utm_source')   || '',
-        utm_medium:   document.getElementById('${utmM}')?.value.trim()  || params.get('utm_medium')   || '',
-        utm_campaign: document.getElementById('${utmC}')?.value.trim()  || params.get('utm_campaign') || '',
-        utm_content:  document.getElementById('${utmCt}')?.value.trim() || params.get('utm_content')  || '',
-        utm_term:     document.getElementById('${utmT}')?.value.trim()  || params.get('utm_term')     || '',
-        origem:       ORIGEM,
-        lancamento:   LANCAMENTO,
-        timestamp:    new Date().toISOString()
-      };
-      if(navigator.sendBeacon){
-        navigator.sendBeacon(WEBHOOK, new Blob([JSON.stringify(data)], {type:'application/json'}));
-      } else {
-        fetch(WEBHOOK, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),keepalive:true}).catch(function(){});
-      }
-    });
-  }
-})();
-<\/script>`;
-
-  document.getElementById('script-gerado').value = script;
-  switchTab('formulario');
-  toast('Script gerado!', 'success');
-}
-
-// ══════════════════════════════════════════
-// IA — GERAR COPY
-// ══════════════════════════════════════════
-async function gerarIA(tipo){
-  const brief = document.getElementById('ai-brief').value.trim();
-  if(!brief){ toast('Preencha o briefing primeiro.', 'error'); return; }
-  const bar = document.getElementById('ai-bar');
-  bar.classList.add('visible');
-  document.querySelectorAll('.btn-ai').forEach(b=>b.disabled=true);
-
-  const prompts = {
-    headline: `Crie 3 opções de headline para uma página de vendas. Retorne APENAS JSON: {"headlines":["...","...","..."]}. Briefing: ${brief}`,
-    subheadline: `Crie 3 opções de subheadline (2 linhas cada). Retorne APENAS JSON: {"subs":["...","...","..."]}. Briefing: ${brief}`,
-    cta: `Crie 3 opções de CTA principal e 2 de CTA WhatsApp. Retorne APENAS JSON: {"ctas":["...","...","..."],"was":["...","..."]}. Briefing: ${brief}`,
-    beneficios: `Liste 6 benefícios/transformações em bullets curtos. Retorne APENAS JSON: {"beneficios":["...","...","...","...","...","..."]}. Briefing: ${brief}`,
-    tudo: `Crie copy completa para página de vendas. Retorne APENAS JSON: {"headline":"...","subheadline":"...","cta":"...","ctaWa":"...","beneficios":["...","...","...","...","..."]}. Briefing: ${brief}`
-  };
-
-  try{
-    // Busca chave e modelo do Supabase Auren
-    const [{data:keyRow},{data:modelRow}] = await Promise.all([
-      sbAuren.from('app_config').select('value').eq('key','anthropic_api_key').single(),
-      sbAuren.from('app_config').select('value').eq('key','ai_model_smart').single()
+    const [{data:s},{data:k},{data:m}] = await Promise.all([
+      sbAu.from('admin_secrets').select('github_token').eq('project','nsd').single(),
+      sbAu.from('app_config').select('value').eq('key','anthropic_api_key').single(),
+      sbAu.from('app_config').select('value').eq('key','ai_model_smart').single()
     ]);
-    const apiKey = keyRow?.value;
-    const model  = modelRow?.value || 'claude-sonnet-4-20250514';
-    if(!apiKey) throw new Error('Chave da API Anthropic não encontrada em app_config.');
+    ghToken = s?.github_token||null;
+    aiKey   = k?.value||null;
+    aiModel = m?.value||'claude-sonnet-4-20250514';
+  }catch(e){ console.warn('creds',e); }
+}
 
+async function loadSites(){
+  try{
+    const {data} = await sbNS.from('sites').select('*').order('created_at',{ascending:false});
+    sites = data||[];
+    renderSidebar(sites);
+  }catch(e){ console.warn('sites',e); }
+}
+
+function renderSidebar(list){
+  const el = document.getElementById('sb-list');
+  if(!list.length){ el.innerHTML='<div style="text-align:center;color:var(--text3);font-size:0.75rem;padding:2rem 0">Nenhum site criado ainda</div>'; return; }
+  const g={captura:[],vendas:[],obrigado:[],vsl:[]};
+  list.forEach(s=>{ if(g[s.tipo]) g[s.tipo].push(s); });
+  const nm={captura:'Captura',vendas:'Vendas',obrigado:'Obrigado',vsl:'VSL'};
+  const bc={captura:'bc',vendas:'bv',obrigado:'bo',vsl:'bk'};
+  let h='';
+  Object.keys(g).forEach(t=>{
+    if(!g[t].length) return;
+    h+=`<div class="s-cat">${nm[t]}</div>`;
+    g[t].forEach(s=>{
+      const url=PROJ.dominio+'/'+s.slug, ac=cur?.id===s.id?' active':'';
+      h+=`<div class="s-item${ac}" onclick="selSite('${s.id}')">
+        <div class="s-name">${s.nome}<span class="s-badge ${bc[s.tipo]}">${s.tipo}</span></div>
+        <div class="s-url"><span>${url}</span><button class="btn-cu" onclick="event.stopPropagation();cpUrl('${url}')" title="Copiar URL">📋</button></div>
+        <span class="sp ${s.status==='publicado'?'sp-pub':'sp-ras'}">${s.status||'rascunho'}</span>
+      </div>`;
+    });
+  });
+  el.innerHTML = h;
+}
+
+function filterSites(){
+  const q=document.getElementById('sb-search').value.toLowerCase(), t=document.getElementById('sb-tipo').value;
+  renderSidebar(sites.filter(s=>(!q||s.nome.toLowerCase().includes(q)||s.slug.toLowerCase().includes(q))&&(!t||s.tipo===t)));
+}
+
+async function selSite(id){
+  cur = sites.find(s=>s.id===id);
+  if(!cur) return;
+  renderSidebar(sites);
+  document.getElementById('ph-nome').textContent = cur.nome;
+  document.getElementById('ph-url').textContent = PROJ.dominio+'/'+cur.slug;
+  document.getElementById('btn-prev').style.display='flex';
+  document.getElementById('btn-pub').style.display='flex';
+  showPanel('chat');
+  const area = document.getElementById('chat-area');
+  area.innerHTML='';
+  addMsg('ai',`Trabalhando em **${cur.nome}** (${cur.tipo}). O que quer fazer?`,[
+    {label:'Gerar página completa',fn:()=>genPage()},
+    {label:'Ajustar copy',fn:()=>ins('Ajusta o texto da página: ')},
+    {label:'Ver configurações',fn:()=>showPanel('cfg')}
+  ]);
+}
+
+function addMsg(tipo,texto,acoes){
+  const area=document.getElementById('chat-area'), d=document.createElement('div');
+  d.className='msg '+tipo;
+  const av=tipo==='ai'?'✦':'VC';
+  let abtn='';
+  if(acoes&&acoes.length){
+    abtn='<div class="msg-btns">';
+    acoes.forEach((a,i)=>{ const p=i===0?' p':''; abtn+=`<button class="mb${p}" onclick="act(${acts.length+i})">${a.label}</button>`; });
+    abtn+='</div>';
+    acoes.forEach(a=>acts.push(a.fn));
+  }
+  const tf=texto.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  d.innerHTML=`<div class="av">${av}</div><div><div class="bubble">${tf}</div>${abtn}</div>`;
+  area.appendChild(d);
+  area.scrollTop=area.scrollHeight;
+}
+function act(i){ if(acts[i]) acts[i](); }
+
+function addTyping(){
+  const area=document.getElementById('chat-area'), d=document.createElement('div');
+  d.className='msg ai'; d.id='ty';
+  d.innerHTML='<div class="av">✦</div><div class="typing"><span></span><span></span><span></span></div>';
+  area.appendChild(d); area.scrollTop=area.scrollHeight;
+}
+function remTyping(){ const e=document.getElementById('ty'); if(e) e.remove(); }
+
+async function send(){
+  const inp=document.getElementById('chat-in'), txt=inp.value.trim();
+  if(!txt) return;
+  if(!cur){ toast('Selecione um site primeiro.','error'); return; }
+  if(!aiKey){ toast('Chave da Anthropic não encontrada em app_config.','error'); return; }
+  inp.value=''; inp.style.height='auto';
+  addMsg('user',txt);
+  addTyping();
+  document.getElementById('btn-send').disabled=true;
+  try{
+    const sys=`Você é especialista em criar páginas de venda HTML para ${PROJ.nome} (domínio: ${PROJ.dominio}).
+Site: "${cur.nome}" tipo: ${cur.tipo} slug: /${cur.slug}
+CSS vars: --bg:#0b0e1a; --surface:#111827; --surface2:#1a2236; --text:#f0ece4; --accent:#c9a84c; --green:#22c55e
+Quando pedir para criar/modificar página: gere HTML completo e responsivo.
+Quando for ajuste de texto: responda conversacionalmente e aplique a mudança no HTML existente se houver.`;
+    const msgs=[{role:'user',content:txt}];
+    if(cur.html) msgs.unshift({role:'user',content:'HTML atual da página:\n'+cur.html.substring(0,3000)},{role:'assistant',content:'Entendido, tenho o HTML atual em mãos.'});
     const res = await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: model,
-        max_tokens:1000,
-        messages:[{role:'user',content:prompts[tipo]}]
-      })
+      headers:{'Content-Type':'application/json','x-api-key':aiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:aiModel,max_tokens:4000,system:sys,messages:[{role:'user',content:txt}]})
     });
-    const data = await res.json();
-    const raw = data.content?.[0]?.text || '{}';
-    const clean = raw.replace(/```json|```/g,'').trim();
-    const parsed = JSON.parse(clean);
-
-    if(tipo==='tudo'){
-      if(parsed.headline) document.getElementById('copy-headline').value = parsed.headline;
-      if(parsed.subheadline) document.getElementById('copy-sub').value = parsed.subheadline;
-      if(parsed.cta) document.getElementById('copy-cta').value = parsed.cta;
-      if(parsed.ctaWa) document.getElementById('copy-ctaWa').value = parsed.ctaWa;
-      updatePreview();
-      toast('Copy gerada com sucesso!', 'success');
-    } else if(tipo==='headline' && parsed.headlines?.length){
-      document.getElementById('copy-headline').value = parsed.headlines[0];
-      updatePreview();
-      toast('Headline gerada! (1 de 3)', 'success');
-    } else if(tipo==='subheadline' && parsed.subs?.length){
-      document.getElementById('copy-sub').value = parsed.subs[0];
-      updatePreview();
-      toast('Subheadline gerada!', 'success');
-    } else if(tipo==='cta' && parsed.ctas?.length){
-      document.getElementById('copy-cta').value = parsed.ctas[0];
-      if(parsed.was?.[0]) document.getElementById('copy-ctaWa').value = parsed.was[0];
-      updatePreview();
-      toast('CTAs gerados!', 'success');
+    const data=await res.json();
+    const resp=data.content?.[0]?.text||'Não consegui gerar resposta.';
+    remTyping();
+    const hasHtml=resp.includes('<!DOCTYPE')||resp.includes('<html')||resp.includes('<body');
+    if(hasHtml){
+      const m=resp.match(/<!DOCTYPE[\s\S]*<\/html>/i)||resp.match(/```html\n([\s\S]*?)```/);
+      const html=m?(m[1]||m[0]):resp;
+      await sbNS.from('sites').update({html,updated_at:new Date().toISOString()}).eq('id',cur.id);
+      cur.html=html;
+      localStorage.setItem('nsd-pv-'+cur.id,html);
+      addMsg('ai','Página gerada! Clique em **Abrir preview** para visualizar.',[
+        {label:'Abrir preview',fn:openPreview},
+        {label:'Publicar agora',fn:publishSite}
+      ]);
     } else {
-      toast('Gerado! Verifique os campos.', 'success');
+      addMsg('ai',resp);
     }
-  }catch(e){
-    toast('Erro na IA: '+e.message, 'error');
-  }finally{
-    bar.classList.remove('visible');
-    document.querySelectorAll('.btn-ai').forEach(b=>b.disabled=false);
-  }
+  }catch(e){ remTyping(); addMsg('ai','Erro: '+e.message); }
+  finally{ document.getElementById('btn-send').disabled=false; }
 }
 
-// ══════════════════════════════════════════
-// DASHBOARD
-// ══════════════════════════════════════════
-async function loadDashboard(){
-  const dias = parseInt(document.getElementById('dash-periodo')?.value || 30);
-  const desde = new Date(Date.now() - dias*86400000).toISOString();
+async function genPage(){
+  document.getElementById('chat-in').value=`Crie uma página ${cur.tipo} completa para o site "${cur.nome}". Use tema escuro, responsiva, com countdown (se aplicável), hero section, benefícios, CTA destacado e rodapé. Inclua os pixels configurados no projeto.`;
+  send();
+}
 
+function useSug(el){ document.getElementById('chat-in').value=el.textContent; document.getElementById('chat-in').focus(); }
+function ins(t){ const i=document.getElementById('chat-in'); i.value=t; i.focus(); }
+
+function openPreview(){
+  if(!cur){ toast('Selecione um site.','error'); return; }
+  const html=cur.html||'<html><body style="background:#0b0e1a;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh"><p>Nenhum conteúdo ainda. Use o chat para criar a página.</p></body></html>';
+  const w=window.open('','nsd-pv-'+cur.id);
+  if(!w){ toast('Permita pop-ups para abrir o preview.','error'); return; }
+  w.document.open(); w.document.write(html); w.document.close();
+}
+
+async function publishSite(){
+  if(!cur){ toast('Selecione um site.','error'); return; }
+  if(!cur.html){ toast('Gere o HTML primeiro.','error'); return; }
+  if(!ghToken){ toast('Token GitHub não encontrado.','error'); return; }
+  const btn=document.getElementById('btn-pub');
+  btn.disabled=true; btn.textContent='Publicando...';
   try{
-    const [vRes, cRes, convRes, leadsRes] = await Promise.all([
-      sbNSD.from('visitas').select('*',{count:'exact',head:true}).gte('created_at',desde),
-      sbNSD.from('cliques').select('*',{count:'exact',head:true}).gte('created_at',desde),
-      sbNSD.from('conversoes').select('*',{count:'exact',head:true}).gte('created_at',desde),
-      sbNSD.from('leads').select('nome,email,utm_source,utm_campaign,created_at,lancamento').gte('created_at',desde).order('created_at',{ascending:false}).limit(20)
-    ]);
-
-    const visitas = vRes.count || 0;
-    const cliques = cRes.count || 0;
-    const conv    = convRes.count || 0;
-    const taxa    = cliques>0 ? ((conv/cliques)*100).toFixed(1) : '0.0';
-
-    document.getElementById('m-visitas').textContent  = visitas.toLocaleString('pt-BR');
-    document.getElementById('m-cliques').textContent  = cliques.toLocaleString('pt-BR');
-    document.getElementById('m-conv').textContent     = conv.toLocaleString('pt-BR');
-    document.getElementById('m-taxa').textContent     = taxa+'%';
-    document.getElementById('m-visitas-sub').textContent = 'últimos '+dias+' dias';
-    document.getElementById('m-cliques-sub').textContent = 'nos CTAs';
-    document.getElementById('m-conv-sub').textContent    = 'obrigado.html';
-
-    // Leads table
-    const tbody = document.getElementById('dash-leads-table');
-    if(leadsRes.data?.length){
-      tbody.innerHTML = leadsRes.data.map(l=>`
-        <tr>
-          <td>${l.nome||'—'}</td>
-          <td>${l.email||'—'}</td>
-          <td><span class="badge-blue">${l.utm_source||'direto'}</span></td>
-          <td>${new Date(l.created_at).toLocaleDateString('pt-BR')}</td>
-          <td><span class="badge-amber">${l.lancamento||'—'}</span></td>
-        </tr>`).join('');
-    } else {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3)">Nenhum lead no período</td></tr>';
-    }
-
-    // UTM table — agrupa por source
-    const {data:utmData} = await sbNSD.from('leads')
-      .select('utm_source,utm_campaign').gte('created_at',desde);
-
-    const utmMap = {};
-    (utmData||[]).forEach(r=>{
-      const k = (r.utm_source||'direto')+'|'+(r.utm_campaign||'—');
-      utmMap[k] = (utmMap[k]||0)+1;
-    });
-    const utmRows = Object.entries(utmMap).sort((a,b)=>b[1]-a[1]);
-    const utmTbody = document.getElementById('dash-utm-table');
-    if(utmRows.length){
-      utmTbody.innerHTML = utmRows.map(([k,n])=>{
-        const [src,camp] = k.split('|');
-        return `<tr>
-          <td><span class="badge-blue">${src}</span></td>
-          <td>${camp}</td>
-          <td>${n}</td>
-          <td>—</td>
-          <td>—</td>
-        </tr>`;
-      }).join('');
-    } else {
-      utmTbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3)">Sem dados de UTM</td></tr>';
-    }
-
-  }catch(e){
-    console.warn('dashboard:', e);
-  }
+    const fn=cur.slug+'.html';
+    const apiUrl=`https://api.github.com/repos/${PROJ.gh_repo}/contents/${fn}`;
+    const hdrs={Authorization:'Bearer '+ghToken,Accept:'application/vnd.github+json','Content-Type':'application/json'};
+    let sha=null;
+    const ck=await fetch(apiUrl+'?ref='+PROJ.gh_branch,{headers:hdrs});
+    if(ck.ok){ const cd=await ck.json(); sha=cd.sha; }
+    const body={message:`admin-nsd: publica ${fn}`,content:btoa(unescape(encodeURIComponent(cur.html))),branch:PROJ.gh_branch};
+    if(sha) body.sha=sha;
+    const r=await fetch(apiUrl,{method:'PUT',headers:hdrs,body:JSON.stringify(body)});
+    if(!r.ok){ const err=await r.json(); throw new Error(err.message); }
+    await sbNS.from('sites').update({status:'publicado',updated_at:new Date().toISOString()}).eq('id',cur.id);
+    cur.status='publicado';
+    await loadSites();
+    addMsg('ai',`✓ Publicado em **${PROJ.dominio}/${cur.slug}** — no ar em ~30 segundos.`);
+    toast('Publicado!','success');
+  }catch(e){ toast('Erro: '+e.message,'error'); }
+  finally{ btn.disabled=false; btn.textContent='✦ Publicar'; }
 }
 
-// ══════════════════════════════════════════
-// IMAGENS — SUPABASE STORAGE
-// ══════════════════════════════════════════
-async function handleUpload(input, tipo){
-  const file = input.files[0];
-  if(!file) return;
-  if(file.size > 2*1024*1024){ toast('Arquivo maior que 2MB.','error'); return; }
-
-  toast('Enviando imagem...', 'info');
-  const ext = file.name.split('.').pop();
-  const path = `nsd/${tipo}-${Date.now()}.${ext}`;
-
-  const {error} = await sbNSD.storage.from('imagens').upload(path, file, {upsert:true});
-  if(error){ toast('Erro no upload: '+error.message,'error'); return; }
-
-  const {data} = sbNSD.storage.from('imagens').getPublicUrl(path);
-  const url = data.publicUrl;
-
-  document.getElementById('preview-'+tipo).src = url;
-  document.getElementById('preview-'+tipo).style.display='block';
-  document.getElementById('url-'+tipo).textContent = url;
-  document.getElementById('url-'+tipo).style.display='block';
-  toast('Imagem enviada!','success');
+function showPanel(n){
+  document.getElementById('panel-chat').style.display=n==='chat'?'flex':'none';
+  document.getElementById('panel-cfg').style.display=n==='cfg'?'flex':'none';
+  document.getElementById('panel-utm').style.display=n==='utm'?'flex':'none';
+  ['chat','cfg','utm'].forEach(t=>document.getElementById('tab-'+t)?.classList.toggle('active',t===n));
 }
 
-function copyUrl(tipo){
-  const url = document.getElementById('url-'+tipo).textContent;
-  navigator.clipboard.writeText(url).then(()=>toast('URL copiada!','success'));
+let tipoSel='captura';
+function openModal(){
+  document.getElementById('modal').style.display='block';
+  ['m-nome','m-slug','m-tag','m-co','m-gwa','m-wh'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  upPrev();
 }
+function closeModal(){ document.getElementById('modal').style.display='none'; }
+function selTipo(el){ document.querySelectorAll('.tc').forEach(c=>c.classList.remove('sel')); el.classList.add('sel'); tipoSel=el.dataset.tipo; }
+function upPrev(){ const s=document.getElementById('m-slug')?.value||'slug'; document.getElementById('pslug').textContent=s; }
 
-// ══════════════════════════════════════════
-// UTILITÁRIOS
-// ══════════════════════════════════════════
-function toast(msg, tipo='info'){
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'show '+(tipo==='success'?'success':tipo==='error'?'error':'');
-  setTimeout(()=>{ el.className=''; }, 3000);
-}
-
-function abrirPreview(){
-  window.open(CFG.SITE_URL, '_blank');
-}
-
-async function checkSiteStatus(){
+async function createSite(){
+  const nome=document.getElementById('m-nome').value.trim();
+  const slug=document.getElementById('m-slug').value.trim().toLowerCase().replace(/\s+/g,'-');
+  const tag=document.getElementById('m-tag').value.trim();
+  const co=document.getElementById('m-co').value.trim();
+  const gwa=document.getElementById('m-gwa').value.trim();
+  const wh=document.getElementById('m-wh').value.trim();
+  if(!nome||!slug){ toast('Preencha nome e slug.','error'); return; }
   try{
-    const r = await fetch(CFG.SITE_URL+'?t='+Date.now(),{mode:'no-cors'});
-    document.getElementById('site-dot').classList.remove('off');
-    document.getElementById('site-status').textContent = 'Site no ar';
-  }catch(e){
-    document.getElementById('site-dot').classList.add('off');
-    document.getElementById('site-status').textContent = 'Verificando...';
-  }
+    const {data,error}=await sbNS.from('sites').insert({nome,tipo:tipoSel,slug,tag:tag||null,status:'rascunho',html:null,checkout_link:co||null,grupo_wa_link:gwa||null,webhook_override:wh||null}).select().single();
+    if(error) throw error;
+    closeModal();
+    await loadSites();
+    selSite(data.id);
+    toast('Site criado!','success');
+  }catch(e){ toast('Erro: '+e.message,'error'); }
 }
 
-// Chips de campos do formulário
-document.addEventListener('DOMContentLoaded',()=>{
-  document.querySelectorAll('.chip').forEach(c=>{
-    c.addEventListener('click',()=>c.classList.toggle('on'));
-  });
-  updatePreview();
-  updateWaLink();
-});
-
-// ══════════════════════════════════════════
-// PÁGINA DE OBRIGADO
-// ══════════════════════════════════════════
-var obPerguntas = [
-  { id:'sexo', tipo:'radio', label:'Pergunta 1', texto:'Qual o seu gênero?', opts:['Feminino','Masculino','Prefiro não responder'] },
-  { id:'faixa_etaria', tipo:'radio', label:'Pergunta 2', texto:'Qual a sua faixa etária?', opts:['Menos de 18 anos','18 a 24 anos','25 a 34 anos','35 a 44 anos','45 a 54 anos','55 anos ou mais'] },
-  { id:'interesse', tipo:'escala', label:'Pergunta 3', texto:'De 0 a 5, quanto você está interessado no tema?', min:0, max:5, lMin:'0 = Nada', lMax:'5 = Muito' },
-  { id:'comentario', tipo:'textarea', label:'Pergunta 4', texto:'O que mais te motivou a se inscrever?', ph:'Escreva com suas palavras...' }
-];
-
-function togglePesquisa(on){
-  document.getElementById('ob-pesquisa-campos').style.display = on ? 'block' : 'none';
-  if(on) renderPerguntasAdmin();
+async function loadCfg(){
+  try{
+    if(!ghToken) return;
+    const r=await fetch(`https://api.github.com/repos/${PROJ.gh_repo}/contents/${PROJ.gh_file}?ref=${PROJ.gh_branch}`,{headers:{Authorization:'Bearer '+ghToken,Accept:'application/vnd.github+json'}});
+    if(!r.ok) return;
+    const j=await r.json();
+    const txt=decodeURIComponent(escape(atob(j.content.split('\n').join(''))));
+    let cfg; try{ cfg=eval('('+txt.match(/const CONFIG\s*=\s*(\{[\s\S]*?\});/)[1]+')'); }catch(e){ return; }
+    const set=(id,v)=>{ const el=document.getElementById(id); if(el&&v) el.value=v; };
+    set('cfg-meta',cfg.pixels?.metaPixelID);
+    set('cfg-gtag',cfg.pixels?.googleTagID);
+    set('cfg-gtm',cfg.pixels?.googleTagManager);
+    set('cfg-hp',cfg.pixels?.hotmartPixel);
+    document.getElementById('sstatus').textContent='Site no ar';
+    document.getElementById('sdot').classList.remove('off');
+  }catch(e){ console.warn('cfg',e); }
 }
 
-function renderPerguntasAdmin(){
-  var lista = document.getElementById('ob-perguntas-lista');
-  if(!lista) return;
-  lista.innerHTML = obPerguntas.map(function(p,i){
-    return '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px">'
-      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
-      +'<span style="font-size:0.78rem;font-weight:500;color:var(--accent2)">'+p.label+'</span>'
-      +'<div style="display:flex;gap:6px">'
-      +'<button class="btn-ai" onclick="moverPergunta('+i+',-1)" style="padding:3px 8px">↑</button>'
-      +'<button class="btn-ai" onclick="moverPergunta('+i+',1)" style="padding:3px 8px">↓</button>'
-      +'<button class="btn-ai" onclick="editarPergunta('+i+')" style="padding:3px 8px">Editar</button>'
-      +'<button class="btn-ai" onclick="removerPergunta('+i+')" style="padding:3px 8px;color:var(--red)">✕</button>'
-      +'</div></div>'
-      +'<div style="font-size:0.82rem;color:var(--text)">'+p.texto+'</div>'
-      +'<div style="font-size:0.74rem;color:var(--text3);margin-top:4px">Tipo: '+p.tipo
-      +(p.opts ? ' · '+p.opts.length+' opções' : '')+'</div>'
-      +'</div>';
+function saveConfigs(){ toast('Configurações salvas!','success'); }
+
+async function loadUTMs(){
+  try{
+    const {data}=await sbNS.from('utm_links').select('*').order('created_at',{ascending:false});
+    utms=data||[];
+    renderUTMs();
+  }catch(e){ console.warn('utms',e); }
+}
+
+function renderUTMs(){
+  const tbody=document.getElementById('utm-tbody');
+  if(!utms.length){ tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:1.2rem">Nenhum link criado</td></tr>'; return; }
+  const dom=document.getElementById('utm-dom')?.value||PROJ.dominio;
+  tbody.innerHTML=utms.map((l,i)=>{
+    const params=[];
+    if(l.utm_source) params.push('utm_source='+encodeURIComponent(l.utm_source));
+    if(l.utm_medium) params.push('utm_medium='+encodeURIComponent(l.utm_medium));
+    if(l.utm_campaign) params.push('utm_campaign='+encodeURIComponent(l.utm_campaign));
+    const fullUrl='https://'+dom+(l.destino_slug||'')+(params.length?'?'+params.join('&'):'');
+    const shortUrl=dom+(l.slug_redirect||'/slug');
+    return `<tr>
+      <td><input value="${l.nome||''}" oninput="updUTM(${i},'nome',this.value)" placeholder="Bio Instagram"></td>
+      <td><input value="${l.slug_redirect||''}" oninput="updUTM(${i},'slug_redirect',this.value)" placeholder="/ig-bio" style="width:80px"></td>
+      <td><input value="${l.destino_slug||''}" oninput="updUTM(${i},'destino_slug',this.value)" placeholder="/reforma" style="width:80px"></td>
+      <td><input value="${l.utm_source||''}" oninput="updUTM(${i},'utm_source',this.value)" placeholder="instagram" style="width:85px"></td>
+      <td><input value="${l.utm_medium||''}" oninput="updUTM(${i},'utm_medium',this.value)" placeholder="bio" style="width:65px"></td>
+      <td><input value="${l.utm_campaign||''}" oninput="updUTM(${i},'utm_campaign',this.value)" placeholder="reforma-abr" style="width:95px"></td>
+      <td>
+        <div class="ulp">${shortUrl}</div>
+        <div class="ua">↓ redireciona para</div>
+        <div class="ulp" style="font-size:0.63rem;color:var(--text3)">${fullUrl}</div>
+        <button class="btn-cl" onclick="navigator.clipboard.writeText('https://${shortUrl}').then(()=>toast('Copiado!','success'))">Copiar link curto</button>
+      </td>
+      <td><button class="btn-dr" onclick="delUTM(${i})">✕</button></td>
+    </tr>`;
   }).join('');
 }
 
-function adicionarPergunta(){
-  var tipos = ['radio','escala','textarea'];
-  var tipo = prompt('Tipo da pergunta: 1=Radio  2=Escala  3=Texto livre. Digite 1, 2 ou 3:');
-  if(!tipo) return;
-  var tipoMap = {'1':'radio','2':'escala','3':'textarea'};
-  var t = tipoMap[tipo.trim()] || 'radio';
-  var texto = prompt('Texto da pergunta:');
-  if(!texto) return;
-  var nova = { id:'p_'+Date.now(), tipo:t, label:'Pergunta '+(obPerguntas.length+1), texto:texto };
-  if(t === 'radio'){
-    var opts = prompt('Opções separadas por vírgula:');
-    nova.opts = opts ? opts.split(',').map(function(o){ return o.trim(); }) : ['Opção 1','Opção 2'];
-  } else if(t === 'escala'){
-    nova.min = 0; nova.max = 5; nova.lMin = '0 = Nada'; nova.lMax = '5 = Muito';
-  } else {
-    nova.ph = 'Escreva com suas palavras...';
-  }
-  obPerguntas.push(nova);
-  renderPerguntasAdmin();
+async function addUTM(){
+  try{
+    const {data,error}=await sbNS.from('utm_links').insert({nome:'',slug_redirect:'',destino_slug:'',utm_source:'',utm_medium:'',utm_campaign:''}).select().single();
+    if(error) throw error;
+    utms.unshift(data);
+    renderUTMs();
+    showPanel('utm');
+  }catch(e){ toast('Erro: '+e.message,'error'); }
 }
 
-function removerPergunta(i){
-  if(!confirm('Remover esta pergunta?')) return;
-  obPerguntas.splice(i,1);
-  renderPerguntasAdmin();
+async function updUTM(i,campo,valor){
+  utms[i][campo]=valor;
+  try{ await sbNS.from('utm_links').update({[campo]:valor}).eq('id',utms[i].id); }catch(e){ console.warn(e); }
+  renderUTMs();
 }
 
-function moverPergunta(i, dir){
-  var j = i + dir;
-  if(j < 0 || j >= obPerguntas.length) return;
-  var tmp = obPerguntas[i];
-  obPerguntas[i] = obPerguntas[j];
-  obPerguntas[j] = tmp;
-  renderPerguntasAdmin();
+async function delUTM(i){
+  if(!confirm('Remover este link?')) return;
+  try{ await sbNS.from('utm_links').delete().eq('id',utms[i].id); utms.splice(i,1); renderUTMs(); }catch(e){ toast('Erro: '+e.message,'error'); }
 }
 
-function editarPergunta(i){
-  var p = obPerguntas[i];
-  var novoTexto = prompt('Texto da pergunta:', p.texto);
-  if(!novoTexto) return;
-  p.texto = novoTexto;
-  if(p.tipo === 'radio'){
-    var novasOpts = prompt('Opções (separadas por vírgula):', p.opts.join(', '));
-    if(novasOpts) p.opts = novasOpts.split(',').map(function(o){ return o.trim(); });
-  }
-  renderPerguntasAdmin();
+function cpUrl(url){ navigator.clipboard.writeText('https://'+url).then(()=>toast('URL copiada!','success')); }
+
+function toast(msg,tipo='info'){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.className='show '+(tipo==='success'?'success':tipo==='error'?'error':'');
+  setTimeout(()=>{ el.className=''; },3000);
 }
 
-function gerarScriptObrigado(){
-  var g = function(id){ var el=document.getElementById(id); return el?el.value.trim():''; };
-  var webhook    = g('ob-webhook');
-  var wppLink    = g('ob-wpp-link');
-  var origem     = g('ob-origem')||'organico';
-  var timer      = parseInt(g('ob-timer'))||7;
-  var lancamento = g('ob-lancamento')||'NSD_LC_01';
-  var ativa      = document.getElementById('ob-pesquisa-ativa').checked;
-  var pJson      = JSON.stringify(obPerguntas, null, 2);
-
-  if(!ativa){
-    document.getElementById('ob-script-gerado').value = '(Pesquisa desativada)';
-    return;
-  }
-
-  var lines = [];
-  lines.push('<script>');
-  lines.push('(function(){');
-  lines.push('  var WEBHOOK    = "' + webhook + '";');
-  lines.push('  var WPP_LINK   = "' + wppLink + '";');
-  lines.push('  var ORIGEM     = "' + origem + '";');
-  lines.push('  var LANCAMENTO = "' + lancamento + '";');
-  lines.push('  var TIMER_SEC  = ' + timer + ';');
-  lines.push('  var perguntas  = ' + pJson + ';');
-  lines.push('');
-  lines.push('  /* Cole o restante do script de pesquisa aqui */');
-  lines.push('})();');
-  lines.push('<\/script>');
-
-  document.getElementById('ob-script-gerado').value = lines.join('\n');
-}
-
-function copiarScriptObrigado(){
-  var el = document.getElementById('ob-script-gerado');
-  navigator.clipboard.writeText(el.value).then(function(){ toast('Script copiado!','success'); });
+async function checkStatus(){
+  try{ await fetch('https://'+PROJ.dominio+'?t='+Date.now(),{mode:'no-cors'}); document.getElementById('sdot').classList.remove('off'); document.getElementById('sstatus').textContent='Site no ar'; }
+  catch(e){ document.getElementById('sdot').classList.add('off'); document.getElementById('sstatus').textContent='Verificando...'; }
 }
 </script>
 </body>
